@@ -35,9 +35,10 @@ using MeshBuilding.Mesh;
 //         new(0, 1, 2, 1, 2),
 //     },
 //     AbscissaSplits = new[] { 3, 2, 1, 2, 3 },
-//     AbscissaK = new[] { 1.0, 1.0, 1.0, 1.0, 1.0 },
+//     AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
 //     OrdinateSplits = new[] { 4, 2 },
-//     OrdinateK = new[] { 1.0, 1.0 }
+//     OrdinateK = new[] { -1.5, 1.5 },
+//     Refinement = 0
 // };
 
 var meshParameters = new MeshParameters
@@ -74,17 +75,31 @@ var meshParameters = new MeshParameters
     },
     Areas = new Area[]
     {
-        new(0, 0, 1, 0, 2),
-        new(0, 1, 3, 0, 1),
-        new(0, 3, 4, 0, 2),
-        new(0, 0, 1, 2, 4),
-        new(0, 1, 3, 3, 4),
-        new(0, 3, 4, 2, 4)
+        new(0, 1, 0, 2, 0),
+        new(1, 3, 0, 1, 0),
+        new(3, 4, 0, 2, 0),
+        new(0, 1, 2, 4, 0),
+        new(1, 3, 3, 4, 0),
+        new(3, 4, 2, 4, 0),
+        new(1, 3, 1, 3, -1)
+    },
+    Borders = new Border[]
+    {
+        new(new[] { 0, 4 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 0, 20 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 4, 24 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 20, 24 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 6, 7, 8, 13, 18, 17, 16, 11 }, BoundaryType.Dirichlet, 0)
+    },
+    Materials = new Material[]
+    {
+        new(1.0, 0.0)
     },
     AbscissaSplits = new[] { 2, 1, 1, 3 },
     AbscissaK = new[] { 1.0, 1.0, 1.0, 1.0 },
     OrdinateSplits = new[] { 3, 1, 1, 3 },
-    OrdinateK = new[] { -1.5, 1.0, 1.0, 1.5 }
+    OrdinateK = new[] { -1.5, 1.0, 1.0, 1.5 },
+    Refinement = 2
 };
 
 var meshManager = new MeshManager(new MeshBuilder(meshParameters));
