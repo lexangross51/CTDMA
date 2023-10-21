@@ -2,106 +2,62 @@
 using MeshBuilding.Geometry;
 using MeshBuilding.Mesh;
 
-// var meshParameters = new MeshParameters
-// {
-//     AbscissaPointsCount = 6,
-//     OrdinatePointsCount = 3,
-//     ControlPoints = new Point[]
-//     {
-//         new(0, 0),
-//         new(2, 0),
-//         new(4, 0),
-//         new(5, 0),
-//         new(7, 0),
-//         new(9, 0),
-//         new(0, 4),
-//         new(2, 4),
-//         new(4, 3),
-//         new(5, 3),
-//         new(7, 4),
-//         new(9, 4),
-//         new(0, 6),
-//         new(2, 6),
-//         new(4, 6),
-//         new(5, 6),
-//         new(7, 6),
-//         new(9, 6)
-//     },
-//     Areas = new Area[]
-//     {
-//         new(0, 0, 1, 0, 2),
-//         new(0, 1, 2, 0, 1),
-//         new(0, 2, 3, 0, 2),
-//         new(0, 1, 2, 1, 2),
-//     },
-//     AbscissaSplits = new[] { 3, 2, 1, 2, 3 },
-//     AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
-//     OrdinateSplits = new[] { 4, 2 },
-//     OrdinateK = new[] { -1.5, 1.5 },
-//     Refinement = 0
-// };
-
 var meshParameters = new MeshParameters
 {
-    AbscissaPointsCount = 5,
-    OrdinatePointsCount = 5,
+    AbscissaPointsCount = 6,
+    OrdinatePointsCount = 3,
     ControlPoints = new Point[]
     {
-        new(0.0, 0.0),
-        new(2.0, 0.0),
-        new(4.0, 0.0),
-        new(6.0, 0.0),
-        new(8.0, 0.0),
-        new(0.0, 5.27),
-        new(2.44, 4.94),
-        new(3.5, 4.5),
-        new(4.56, 4.94),
-        new(8.0, 5.27),
-        new(0.0, 6.0),
-        new(2.0, 6.0),
-        new(3.5, 6.0),
-        new(5.0, 6.0),
-        new(8.0, 6.0),
-        new(0.0, 6.73),
-        new(2.44, 7.06),
-        new(3.5, 7.5),
-        new(4.56, 7.06),
-        new(8.0, 6.73),
-        new(0.0, 11.0),
-        new(2.0, 11.0),
-        new(4.0, 11.0),
-        new(6.0, 11.0),
-        new(8.0, 11.0),
+        new(0, 0),
+        new(2, 0),
+        new(4, 0),
+        new(5, 0),
+        new(7, 0),
+        new(9, 0),
+        new(0, 4),
+        new(2, 4),
+        new(4, 3),
+        new(5, 3),
+        new(7, 4),
+        new(9, 4),
+        new(0, 6),
+        new(2, 6),
+        new(4, 6),
+        new(5, 6),
+        new(7, 6),
+        new(9, 6)
     },
     Areas = new Area[]
     {
         new(0, 1, 0, 2, 0),
-        new(1, 3, 0, 1, 0),
-        new(3, 4, 0, 2, 0),
-        new(0, 1, 2, 4, 0),
-        new(1, 3, 3, 4, 0),
-        new(3, 4, 2, 4, 0),
-        new(1, 3, 1, 3, -1)
+        new(1, 4, 0, 1, 0),
+        new(4, 5, 0, 2, 0),
+        new(1, 4, 1, 2, 0),
     },
     Borders = new Border[]
     {
-        new(new[] { 0, 4 }, BoundaryType.Dirichlet, 0),
-        new(new[] { 0, 20 }, BoundaryType.Dirichlet, 0),
-        new(new[] { 4, 24 }, BoundaryType.Dirichlet, 0),
-        new(new[] { 20, 24 }, BoundaryType.Dirichlet, 0),
-        new(new[] { 6, 7, 8, 13, 18, 17, 16, 11 }, BoundaryType.Dirichlet, 0)
+        new(new[] { 0, 5 }, BoundaryType.Dirichlet, 1),
+        new(new[] { 0, 12 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 5, 17 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 12, 17 }, BoundaryType.Dirichlet, 0),
+        new(new[] { 13, 7, 8, 9, 10, 16 }, BoundaryType.Dirichlet, 1)
     },
-    Materials = new Material[]
+    BoundaryFormulas = new Func<double, double, double>[]
     {
-        new(1.0, 0.0)
+        (x, y) => x + y,
+        (_, y) => y
     },
-    AbscissaSplits = new[] { 2, 1, 1, 3 },
-    AbscissaK = new[] { 1.0, 1.0, 1.0, 1.0 },
-    OrdinateSplits = new[] { 3, 1, 1, 3 },
-    OrdinateK = new[] { -1.5, 1.0, 1.0, 1.5 },
+    AreaProperties = new AreaProperty[]
+    {
+        new(1.0, 0.0, (_, _) => 1.0 )
+    },
+    AbscissaSplits = new[] { 3, 2, 1, 2, 3 },
+    AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
+    OrdinateSplits = new[] { 4, 2 },
+    OrdinateK = new[] { -1.5, 1.5 },
     Refinement = 2
 };
 
 var meshManager = new MeshManager(new MeshBuilder(meshParameters));
 var mesh = meshManager.CreateMesh();
-Utilities.SaveMesh(mesh, @"C:\\Users\\lexan\\source\\repos\\Python");
+Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");

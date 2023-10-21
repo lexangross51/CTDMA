@@ -41,7 +41,8 @@ public class MeshParameters
     public Point[] ControlPoints { get; init; } = null!;
     public Area[] Areas { get; init; } = null!;
     public Border[] Borders { get; init; } = null!;
-    public Material[] Materials { get; init; } = null!;
+    public Func<double, double, double>[] BoundaryFormulas { get; init; } = null!;
+    public AreaProperty[] AreaProperties { get; init; } = null!;
     public int[] AbscissaSplits { get; init; } = null!;
     public int[] OrdinateSplits { get; init; } = null!;
     public double[] AbscissaK { get; init; } = null!;

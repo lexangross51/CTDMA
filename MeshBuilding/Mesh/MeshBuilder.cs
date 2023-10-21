@@ -12,9 +12,8 @@ public class MeshBuilder : IMeshBuilder
     private List<int> _fictitiousNodes;
     private List<int> _fictitiousElements;
     
-    private readonly List<Material> _materials;
     private readonly HashSet<Dirichlet> _dirichlet;
-    private readonly HashSet<Neumann> _neumann;
+    private HashSet<Neumann>? _neumann;
 
     public MeshBuilder(MeshParameters meshParameters)
     {
@@ -32,9 +31,7 @@ public class MeshBuilder : IMeshBuilder
         _fictitiousNodes = new List<int>();
         _fictitiousElements = new List<int>();
 
-        _materials = new List<Material>();
         _dirichlet = new HashSet<Dirichlet>();
-        _neumann = new HashSet<Neumann>();
     }
 
     private void PrepareRefinement()
@@ -243,11 +240,144 @@ public class MeshBuilder : IMeshBuilder
     
     public void CreateBoundaries()
     {
+        foreach (var border in _meshParameters.Borders)
+        {
+            switch (border.BoundaryType)
+            {
+                case BoundaryType.Dirichlet:
+                    ProcessDirichletBoundary(border);
+                    break;
+                case BoundaryType.Neumann:
+                    ProcessNeumannBoundary(border);
+                    break;
+                case BoundaryType.None:
+                    break;
+                default:
+                    ProcessDirichletBoundary(border);
+                    break;
+            }
+        }
+    }
+
+    private void ProcessDirichletBoundary(Border border)
+    {
+        int nx = _meshParameters.AbscissaPointsCount;
+        int totalNx = _meshParameters.AbscissaSplits.Sum() + 1;
+        
+        for (int i = 0; i < border.PointsIndices.Length - 1; i++)
+        {
+            int curr = border.PointsIndices[i];
+            int next = border.PointsIndices[i + 1];
+
+            int ys = curr / nx;
+            int xs = curr - ys * nx;
+            int ye = next / nx;
+            int xe = next - ye * nx;
+
+            xs = _ix[xs];
+            xe = _ix[xe];
+            ys = _iy[ys];
+            ye = _iy[ye];
+
+            (xs, xe) = xe < xs ? (xe, xs) : (xs, xe);
+            (ys, ye) = ye < ys ? (ye, ys) : (ys, ye);
+
+            for (int j = 0; j < _points.Length; j++)
+            {
+                if (_fictitiousNodes.Any(n => n == j)) continue;
+
+                int iy = j / totalNx;
+                int ix = j - iy * totalNx;
+                
+                if (ix < xs || ix > xe || iy < ys || iy > ye) continue;
+
+                var value = _meshParameters.BoundaryFormulas[border.FormulaIndex](_points[j].X, _points[j].Y);
+                _dirichlet.Add(new Dirichlet(j, value));
+            }
+        }
+    }
+
+    private void ProcessNeumannBoundary(Border border)
+    {
+        _neumann ??= new HashSet<Neumann>();
+        
+        int nx = _meshParameters.AbscissaPointsCount;
+        int totalNx = _meshParameters.AbscissaSplits.Sum() + 1;
+        
+        for (int i = 0; i < border.PointsIndices.Length - 1; i++)
+        {
+            int curr = border.PointsIndices[i];
+            int next = border.PointsIndices[i + 1];
+
+            int ys = curr / nx;
+            int xs = curr - ys * nx;
+            int ye = next / nx;
+            int xe = next - ye * nx;
+            
+            xs = _ix[xs];
+            xe = _ix[xe];
+            ys = _iy[ys];
+            ye = _iy[ye];
+
+            (xs, xe) = xe < xs ? (xe, xs) : (xs, xe);
+            (ys, ye) = ye < ys ? (ye, ys) : (ys, ye);
+
+            // Horizontal line
+            if (ys == ye)
+            {
+                for (int j = 0; j < _points.Length; j++)
+                {
+                    int iy = j / totalNx;
+                    int ix = j - iy * totalNx;
+                    
+                    // If point is not on the line
+                    if (iy != ys || ix < xs || ix > xe) continue;
+                    
+                    _neumann.Add(new Neumann(j, j + 1,
+                        _meshParameters.BoundaryFormulas[border.FormulaIndex]));
+                    
+                    while (ix + 1 != xe)
+                    {
+                        j++;
+                        ix = j - iy * totalNx;
+
+                        _neumann.Add(new Neumann(j, j + 1, 
+                            _meshParameters.BoundaryFormulas[border.FormulaIndex]));
+                    }
+                    break;
+                }
+            }
+            // Vertical line
+            else
+            {
+                for (int j = 0; j < _points.Length; j++)
+                {
+                    int iy = j / totalNx;
+                    int ix = j - iy * totalNx;
+                    
+                    // If point is not on the line
+                    if (ix != xs || iy < ys || iy > ye) continue;
+                    
+                    _neumann.Add(new Neumann(j, j + totalNx,
+                        _meshParameters.BoundaryFormulas[border.FormulaIndex]));
+                    
+                    while (iy + 1 != ye)
+                    {
+                        j += totalNx;
+                        iy = j / totalNx;
+                        
+                        _neumann.Add(new Neumann(j, j + totalNx,
+                            _meshParameters.BoundaryFormulas[border.FormulaIndex]));
+                    }
+                    break;
+                }
+            }
+        }
     }
 
     public Mesh GetMesh()
     {
-        return new Mesh(_points, _elements, _meshParameters.Materials, _dirichlet)
+        return new Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
         {
             FictitiousNodes = _fictitiousNodes.ToArray(),
             FictitiousElements = _fictitiousElements.ToArray()

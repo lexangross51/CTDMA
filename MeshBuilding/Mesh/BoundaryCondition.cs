@@ -5,9 +5,9 @@ namespace MeshBuilding.Mesh;
 public struct Dirichlet
 {
     public int Node { get; }
-    public Func<Point, double> Value { get; }
+    public double Value { get; }
 
-    public Dirichlet(int node, Func<Point, double> value)
+    public Dirichlet(int node, double value)
     {
         Node = node;
         Value = value;
@@ -18,9 +18,9 @@ public struct Neumann
 {
     public int BorderStart { get; }
     public int BorderEnd { get; }
-    public double Theta { get; }
+    public Func<double, double, double> Theta { get; }
 
-    public Neumann(int borderStart, int borderEnd, double theta)
+    public Neumann(int borderStart, int borderEnd, Func<double, double, double> theta)
     {
         BorderStart = borderStart;
         BorderEnd = borderEnd;

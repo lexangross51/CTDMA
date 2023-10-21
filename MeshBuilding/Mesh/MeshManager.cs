@@ -2,17 +2,16 @@
 
 public class MeshManager
 {
-    public IMeshBuilder MeshBuilder { get; set; }
+    private readonly IMeshBuilder _meshBuilder;
 
     public MeshManager(IMeshBuilder meshBuilder)
-    {
-        MeshBuilder = meshBuilder;
-    }
+        => _meshBuilder = meshBuilder;
 
     public Mesh CreateMesh()
     {
-        MeshBuilder.CreatePoints();
-        MeshBuilder.CreateElements();
-        return MeshBuilder.GetMesh();
+        _meshBuilder.CreatePoints();
+        _meshBuilder.CreateElements();
+        _meshBuilder.CreateBoundaries();
+        return _meshBuilder.GetMesh();
     }
 }
