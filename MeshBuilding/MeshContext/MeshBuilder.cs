@@ -1,6 +1,7 @@
 ﻿using MeshBuilding.Geometry;
+using MeshBuilding.MeshContext.Interfaces;
 
-namespace MeshBuilding.Mesh;
+namespace MeshBuilding.MeshContext;
 
 public class MeshBuilder : IMeshBuilder
 {
@@ -375,9 +376,9 @@ public class MeshBuilder : IMeshBuilder
         }
     }
 
-    public Mesh GetMesh()
+    public MeshContext.Mesh GetMesh()
     {
-        return new Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
+        return new MeshContext.Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
         {
             FictitiousNodes = _fictitiousNodes.ToArray(),
             FictitiousElements = _fictitiousElements.ToArray()

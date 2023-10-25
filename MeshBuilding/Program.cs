@@ -1,6 +1,8 @@
 ﻿using MeshBuilding;
+using MeshBuilding.Algorithms;
+using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.Geometry;
-using MeshBuilding.Mesh;
+using MeshBuilding.MeshContext;
 
 var meshParameters = new MeshParameters
 {
@@ -40,7 +42,7 @@ var meshParameters = new MeshParameters
         new(new[] { 0, 12 }, BoundaryType.Dirichlet, 0),
         new(new[] { 5, 17 }, BoundaryType.Dirichlet, 0),
         new(new[] { 12, 17 }, BoundaryType.Dirichlet, 0),
-        new(new[] { 13, 7, 8, 9, 10, 16 }, BoundaryType.Dirichlet, 1)
+        new(new[] { 13, 7, 8, 9, 10, 16 }, BoundaryType.Neumann, 1)
     },
     BoundaryFormulas = new Func<double, double, double>[]
     {
@@ -55,9 +57,11 @@ var meshParameters = new MeshParameters
     AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
     OrdinateSplits = new[] { 4, 2 },
     OrdinateK = new[] { -1.5, 1.5 },
-    Refinement = 2
+    Refinement = 0
 };
 
 var meshManager = new MeshManager(new MeshBuilder(meshParameters));
 var mesh = meshManager.CreateMesh();
 Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
+
+var basisInfo = Numerator.NumerateBasisFunctions(mesh, new BiQuadraticBasis());

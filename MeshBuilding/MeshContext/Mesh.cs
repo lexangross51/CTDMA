@@ -1,6 +1,6 @@
 ﻿using MeshBuilding.Geometry;
 
-namespace MeshBuilding.Mesh;
+namespace MeshBuilding.MeshContext;
 
 public class Mesh
 {

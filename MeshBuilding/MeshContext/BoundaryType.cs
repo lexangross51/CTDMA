@@ -1,4 +1,4 @@
-﻿namespace MeshBuilding.Mesh;
+﻿namespace MeshBuilding.MeshContext;
 
 public enum BoundaryType
 {

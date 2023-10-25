@@ -1,4 +1,6 @@
-﻿namespace MeshBuilding.Mesh;
+﻿using MeshBuilding.MeshContext.Interfaces;
+
+namespace MeshBuilding.MeshContext;
 
 public class MeshManager
 {
@@ -7,7 +9,7 @@ public class MeshManager
     public MeshManager(IMeshBuilder meshBuilder)
         => _meshBuilder = meshBuilder;
 
-    public Mesh CreateMesh()
+    public MeshContext.Mesh CreateMesh()
     {
         _meshBuilder.CreatePoints();
         _meshBuilder.CreateElements();

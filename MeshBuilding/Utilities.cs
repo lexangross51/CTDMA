@@ -6,7 +6,7 @@ public static class Utilities
 {
     #region Write
 
-    public static void SaveMesh(Mesh.Mesh mesh, string folder)
+    public static void SaveMesh(MeshContext.Mesh mesh, string folder)
     {
         // Points
         var sw = new StreamWriter($"{folder}/points");
