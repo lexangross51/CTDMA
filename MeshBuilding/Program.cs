@@ -65,3 +65,5 @@ var mesh = meshManager.CreateMesh();
 Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
 
 var basisInfo = Numerator.NumerateBasisFunctions(mesh, new BiQuadraticBasis());
+var portrait = PortraitBuilder.GeneratePortrait(basisInfo);
+var b = portrait.Ig;

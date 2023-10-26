@@ -1,4 +1,6 @@
-﻿namespace MeshBuilding.FemContext.BasisInfo;
+﻿using System.Collections;
+
+namespace MeshBuilding.FemContext.BasisInfo;
 
 public struct BasisInfoItem
 {
@@ -14,7 +16,7 @@ public struct BasisInfoItem
     }
 }
 
-public class BasisInfoCollection
+public class BasisInfoCollection : IEnumerable<KeyValuePair<int, BasisInfoItem[]>>
 {
     private readonly Dictionary<int, BasisInfoItem[]> _basisByElements;
 
@@ -33,4 +35,9 @@ public class BasisInfoCollection
         get => _basisByElements[elementIndex][functionIndex];
         set => _basisByElements[elementIndex][functionIndex] = value;
     }
+
+    public IEnumerator<KeyValuePair<int, BasisInfoItem[]>> GetEnumerator()
+        => _basisByElements.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }
