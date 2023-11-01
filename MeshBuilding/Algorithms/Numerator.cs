@@ -19,7 +19,7 @@ public static class Numerator
             basisInfo[ielem, 1] = new BasisInfoItem(k + 1, BasisFunctionType.ByEdgeNode, 0);
             basisInfo[ielem, 2] = new BasisInfoItem(k + 2, BasisFunctionType.ByGeometricNode, nodes[1]);
             basisInfo[ielem, 3] = new BasisInfoItem(k + 2 * nx - 1, BasisFunctionType.ByEdgeNode, 1);
-            basisInfo[ielem, 4] = new BasisInfoItem(k + 2 * nx, BasisFunctionType.BuInnerNode, -1);
+            basisInfo[ielem, 4] = new BasisInfoItem(k + 2 * nx, BasisFunctionType.ByInnerNode, -1);
             basisInfo[ielem, 5] = new BasisInfoItem(k + 2 * nx + 1, BasisFunctionType.ByEdgeNode, 2);
             basisInfo[ielem, 6] = new BasisInfoItem(k + 4 * nx - 2, BasisFunctionType.ByGeometricNode, nodes[2]);
             basisInfo[ielem, 7] = new BasisInfoItem(k + 4 * nx - 1, BasisFunctionType.ByEdgeNode, 3);

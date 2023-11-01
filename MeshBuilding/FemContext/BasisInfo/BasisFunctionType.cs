@@ -3,6 +3,6 @@
 public enum BasisFunctionType : byte
 {
     ByGeometricNode,
-    BuInnerNode,
+    ByInnerNode,
     ByEdgeNode
 }
