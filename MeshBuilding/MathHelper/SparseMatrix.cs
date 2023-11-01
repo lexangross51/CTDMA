@@ -85,4 +85,17 @@ public class SparseMatrix
             sw.WriteLine();
         }
     }
+
+    public void Clear()
+    {
+        for (int i = 0; i < Size; i++)
+        {
+            Di[i] = 0.0;
+        }
+
+        for (int i = 0; i < Gg.Length; i++)
+        {
+            Gg[i] = 0.0;
+        }
+    }
 }

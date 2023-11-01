@@ -1,10 +1,8 @@
-﻿using System.Numerics;
+﻿namespace MeshBuilding.MathHelper;
 
-namespace MeshBuilding.MathHelper;
-
-public class Matrix<T> where T : INumber<T>
+public class Matrix
 {
-    private readonly T[][] _storage;
+    private readonly double[][] _storage;
 
     public int Rows { get; }
     public int Columns { get; }
@@ -13,40 +11,41 @@ public class Matrix<T> where T : INumber<T>
     {
         Rows = nRows;
         Columns = nColumns;
-        _storage = new T[Rows].Select(_ => new T[nColumns]).ToArray();
+        _storage = new double[Rows].Select(_ => new double[nColumns]).ToArray();
     }
-
-    public Matrix(T[,] data)
-    {
-        Rows = data.GetLength(0);
-        Columns = data.GetLength(1);
-
-        _storage = new T[Rows][];
-
-        for (int i = 0; i < Rows; i++)
-        {
-            _storage[i] = new T[Columns];
-
-            for (int j = 0; j < Columns; j++)
-            {
-                _storage[i][j] = data[i, j];
-            }
-        }
-    }
-
-    public T this[int i, int j]
+    
+    public double this[int i, int j]
     {
         get => _storage[i][j];
         set => _storage[i][j] = value;
     }
 
-    public void Fill(T value)
+    public void Fill(double value)
     {
         for (int i = 0; i < Rows; i++)
         {
             for (int j = 0; j < Columns; j++)
             {
                 _storage[i][j] = value;
+            }
+        }
+    }
+    
+    public static void Dot(Matrix matrix, Vector vector, Vector? product)
+    {
+        if (matrix.Columns != vector.Length)
+        {
+            throw new Exception("Numbers of columns not equal to size of vector");
+        }
+
+        product ??= new Vector(vector.Length);
+        product.Fill();
+
+        for (int i = 0; i < matrix.Rows; i++)
+        {
+            for (int j = 0; j < matrix.Columns; j++)
+            {
+                product[i] += matrix[i, j] * vector[j];
             }
         }
     }

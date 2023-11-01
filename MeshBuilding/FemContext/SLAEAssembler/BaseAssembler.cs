@@ -26,8 +26,7 @@ public abstract class BaseAssembler
         Vector = new double[portrait.Ig.Length - 1];
     }
 
-    protected abstract void BuildLocalMatrix(int ielem);
-    protected abstract void BuildLocalVector(int ielem);
+    protected abstract void AssembleLocalSlae(int ielem);
 
     public abstract (SparseMatrix Matrix, double[] Vector) GetSlae();
 }
