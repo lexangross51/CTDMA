@@ -10,30 +10,54 @@ public struct BiQuadraticBasis : IBasis
     {
         return function switch
         {
-            0 => 1.0,
-            1 => 1.0,
-            2 => 1.0,
-            3 => 1.0,
-            4 => 1.0,
-            5 => 1.0,
-            6 => 1.0,
-            7 => 1.0,
-            8 => 1.0,
-            9 => 1.0,
-            _ => throw new ArgumentOutOfRangeException(nameof(function), function, 
+            0 => 4.0 * (x - 0.5) * (x - 1.0) * (y - 0.5) * (y - 1.0),
+            1 => -8.0 * x * (x - 1.0) * (y - 0.5) * (y - 1.0),
+            2 => 4.0 * x * (x - 0.5) * (y - 0.5) * (y - 1.0),
+            3 => -8.0 * (x - 0.5) * (x - 1.0) * y * (y - 1.0),
+            4 => 16.0 * x * (x - 1.0) * y * (y - 1.0),
+            5 => -8.0 * x * (x - 0.5) * y * (y - 1.0),
+            6 => 4.0 * (x - 0.5) * (x - 1.0) * y * (y - 0.5),
+            7 => -8.0 * x * (x - 1.0) * y * (y - 0.5),
+            8 => 4.0 * x * (x - 0.5) * y * (y - 0.5),
+            _ => throw new ArgumentOutOfRangeException(nameof(function), function,
                 $"Function {function} doesn't match interval [0, {BasisSize - 1}]")
         };
     }
 
     public double DPhi(int function, int variable, double x, double y)
     {
-        switch (variable)
+        return variable switch
         {
-            case 0:
-            case 1:
-                
-            default: throw new ArgumentOutOfRangeException(nameof(variable), variable,
-                    $"Function {function} doesn't match interval [0, 1]");
-        }
+            0 => function switch
+            {
+                0 => 4.0 * (x - 1.0 + (x - 0.5)) * (y - 0.5) * (y - 1.0),
+                1 => -8.0 * (x - 1.0 + x) * (y - 0.5) * (y - 1.0),
+                2 => 4.0 * (x - 0.5 + x) * (y - 0.5) * (y - 1.0),
+                3 => -8.0 * (x - 1.0 + (x - 0.5)) * y * (y - 1.0),
+                4 => 16.0 * (x - 1.0 + x) * y * (y - 1.0),
+                5 => -8.0 * (x - 0.5 + x) * y * (y - 1.0),
+                6 => 4.0 * (x - 1.0 + (x - 0.5)) * y * (y - 0.5),
+                7 => -8.0 * (x - 1.0 + x) * y * (y - 0.5),
+                8 => 4.0 * (x - 0.5 + x) * y * (y - 0.5),
+                _ => throw new ArgumentOutOfRangeException(nameof(function), function,
+                    $"Function {function} doesn't match interval [0, {BasisSize - 1}]")
+            },
+            1 => function switch
+            {
+                0 => 4.0 * (x - 0.5) * (x - 1.0) * (y - 1.0 + (y - 0.5)),
+                1 => -8.0 * x * (x - 1.0) * (y - 1.0 + (y - 0.5)),
+                2 => 4.0 * x * (x - 0.5) * (y - 1.0 + (y - 0.5)),
+                3 => -8.0 * (x - 0.5) * (x - 1.0) * (y - 1.0 + y),
+                4 => 16.0 * x * (x - 1.0) * (y - 1.0 + y),
+                5 => -8.0 * x * (x - 0.5) * (y - 1.0 + y),
+                6 => 4.0 * (x - 0.5) * (x - 1.0) * (y - 0.5 + y),
+                7 => -8.0 * x * (x - 1.0) * (y - 0.5 + y),
+                8 => 4.0 * x * (x - 0.5) * (y - 0.5 + y),
+                _ => throw new ArgumentOutOfRangeException(nameof(function), function,
+                    $"Function {function} doesn't match interval [0, {BasisSize - 1}]")
+            },
+            _ => throw new ArgumentOutOfRangeException(nameof(variable), variable,
+                $"Function {function} doesn't match interval [0, 1]")
+        };
     }
 }

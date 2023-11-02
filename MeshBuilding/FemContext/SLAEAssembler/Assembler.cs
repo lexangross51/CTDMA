@@ -13,6 +13,7 @@ public class Assembler : BaseAssembler
     private readonly Matrix _stiffnessMatrix;
     private readonly Matrix _massMatrix;
     private readonly double[] _localVector;
+    private readonly double[] _localRightPart;
     private readonly Point[] _elementPoints = new Point[4];
     private readonly Vector _gradPhiI = new(2);
     private readonly Vector _gradPhiJ = new(2);
@@ -28,16 +29,15 @@ public class Assembler : BaseAssembler
         _stiffnessMatrix = new Matrix(basis.BasisSize, basis.BasisSize);
         _massMatrix = new Matrix(basis.BasisSize, basis.BasisSize);
         _localVector = new double[basis.BasisSize];
+        _localRightPart = new double[basis.BasisSize];
     }
 
     protected override void AssembleLocalSlae(int ielem)
     {
-        var nodes = Mesh.Elements[ielem].Nodes;
-        _elementPoints[0] = Mesh.Points[nodes[0]];
-        _elementPoints[1] = Mesh.Points[nodes[1]];
-        _elementPoints[2] = Mesh.Points[nodes[2]];
-        _elementPoints[3] = Mesh.Points[nodes[3]];
-            
+        var element = Mesh.Elements[ielem];
+        var nodes = element.Nodes;
+        double x = 0.0, y = 0.0;
+        
         for (int i = 0; i < Basis.BasisSize; i++)
         {
             int i1 = i;
@@ -91,11 +91,45 @@ public class Assembler : BaseAssembler
         var source = Mesh.Materials[Mesh.Elements[ielem].AreaNumber].Source;
         for (int i = 0; i < Basis.BasisSize; i++)
         {
-            _localVector[i] = 0.0;
+            var bf = BasisInfo[ielem, i];
+            switch (bf.Type)
+            {
+                case BasisFunctionType.ByGeometricNode:
+                    x = Mesh.Points[bf.Index].X;
+                    y = Mesh.Points[bf.Index].Y;
+                    break;
                 
+                case BasisFunctionType.ByInnerNode:
+                    foreach (var node in nodes)
+                    {
+                        x += Mesh.Points[node].X;
+                        y += Mesh.Points[node].Y;
+                    }
+
+                    x /= nodes.Count;
+                    y /= nodes.Count;
+                    break;
+                
+                case BasisFunctionType.ByEdgeNode:
+                    var edge = element.Edges[bf.Index];
+                    x = (Mesh.Points[edge.Node1].X + Mesh.Points[edge.Node2].X) / 2.0; 
+                    y = (Mesh.Points[edge.Node1].Y + Mesh.Points[edge.Node2].Y) / 2.0; 
+                    break;
+                
+                default: throw new ArgumentOutOfRangeException(nameof(i), i,
+                        $"Function with number {i} doesn't match interval [0, {Basis.BasisSize - 1}]");
+            }
+
+            _localRightPart[i] = source(x, y);
+        }
+
+        for (int i = 0; i < Basis.BasisSize; i++)
+        {
+            _localVector[i] = 0.0;
+            
             for (int j = 0; j < Basis.BasisSize; j++)
             {
-                // _localVector[i] += _massMatrix[i, j] * source(Mesh.Points[nodes[j]]);
+                _localVector[i] += _massMatrix[i, j] * _localRightPart[j];
             }
         }
     }
@@ -115,6 +149,7 @@ public class Assembler : BaseAssembler
             for (int i = 0; i < Basis.BasisSize; i++)
             {
                 int globalI = BasisInfo[ielem, i].FunctionNumber;
+                Vector[globalI] += _localVector[i];
                     
                 for (int j = 0; j < Basis.BasisSize; j++)
                 {
