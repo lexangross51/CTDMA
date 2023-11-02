@@ -1,6 +1,4 @@
-﻿using MeshBuilding;
-using MeshBuilding.Algorithms;
-using MeshBuilding.FemContext;
+﻿using MeshBuilding.FemContext;
 using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.Geometry;
 using MeshBuilding.MeshContext;
@@ -63,7 +61,7 @@ var meshParameters = new MeshParameters
 
 var meshManager = new MeshManager(new MeshBuilder(meshParameters));
 var mesh = meshManager.CreateMesh();
-Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
+// Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
 
 var femSolver = new FemSolver(mesh, new BiQuadraticBasis());
 femSolver.Solve();

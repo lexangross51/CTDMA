@@ -14,7 +14,6 @@ public class Assembler : BaseAssembler
     private readonly Matrix _massMatrix;
     private readonly double[] _localVector;
     private readonly double[] _localRightPart;
-    private readonly Point[] _elementPoints = new Point[4];
     private readonly Vector _gradPhiI = new(2);
     private readonly Vector _gradPhiJ = new(2);
     private readonly Vector _matrixGradI = new(2);
