@@ -27,6 +27,13 @@ public struct BiQuadraticBasis : IBasis
 
     public double DPhi(int function, int variable, double x, double y)
     {
-        throw new NotImplementedException();
+        switch (variable)
+        {
+            case 0:
+            case 1:
+                
+            default: throw new ArgumentOutOfRangeException(nameof(variable), variable,
+                    $"Function {function} doesn't match interval [0, 1]");
+        }
     }
 }

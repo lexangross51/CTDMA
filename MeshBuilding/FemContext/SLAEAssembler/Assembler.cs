@@ -9,9 +9,10 @@ namespace MeshBuilding.FemContext.SLAEAssembler;
 
 public class Assembler : BaseAssembler
 {
-    private Integration _integrator;
+    private readonly Integration _integrator;
     private readonly Matrix _stiffnessMatrix;
     private readonly Matrix _massMatrix;
+    private readonly double[] _localVector;
     private readonly Point[] _elementPoints = new Point[4];
     private readonly Vector _gradPhiI = new(2);
     private readonly Vector _gradPhiJ = new(2);
@@ -26,6 +27,7 @@ public class Assembler : BaseAssembler
 
         _stiffnessMatrix = new Matrix(basis.BasisSize, basis.BasisSize);
         _massMatrix = new Matrix(basis.BasisSize, basis.BasisSize);
+        _localVector = new double[basis.BasisSize];
     }
 
     protected override void AssembleLocalSlae(int ielem)
@@ -46,7 +48,7 @@ public class Assembler : BaseAssembler
 
                 double ScalarFunc(double ksi, double eta)
                 {
-                    var jacobiMatrix = FemHelper.CalculateJacobiMatrix(_elementPoints, Basis, BasisInfo, ksi, eta);
+                    var jacobiMatrix = FemHelper.CalculateJacobiMatrix(Mesh, ielem, Basis, BasisInfo, ksi, eta);
                     double jacobian = FemHelper.Jacobian(jacobiMatrix);
                     FemHelper.InvertJacobiMatrix(jacobiMatrix);
 
@@ -63,6 +65,37 @@ public class Assembler : BaseAssembler
 
 
                 _stiffnessMatrix[i, j] = _stiffnessMatrix[j, i] = _integrator.Integrate2D(ScalarFunc, _masterElement);
+            }
+        }
+        
+        for (int i = 0; i < Basis.BasisSize; i++)
+        {
+            int i1 = i;
+
+            for (int j = 0; j <= i; j++)
+            {
+                int j1 = j;
+
+                double ScalarFunc(double ksi, double eta)
+                {
+                    var jacobiMatrix = FemHelper.CalculateJacobiMatrix(Mesh, ielem, Basis, BasisInfo, ksi, eta);
+                    double jacobian = FemHelper.Jacobian(jacobiMatrix);
+
+                    return Basis.Phi(i1, ksi ,eta) * Basis.Phi(j1, ksi, eta) * Math.Abs(jacobian);
+                }
+
+                _massMatrix[i, j] = _massMatrix[j, i] = _integrator.Integrate2D(ScalarFunc, _masterElement);
+            }
+        }
+
+        var source = Mesh.Materials[Mesh.Elements[ielem].AreaNumber].Source;
+        for (int i = 0; i < Basis.BasisSize; i++)
+        {
+            _localVector[i] = 0.0;
+                
+            for (int j = 0; j < Basis.BasisSize; j++)
+            {
+                // _localVector[i] += _massMatrix[i, j] * source(Mesh.Points[nodes[j]]);
             }
         }
     }
