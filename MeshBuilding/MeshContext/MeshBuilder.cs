@@ -292,8 +292,7 @@ public class MeshBuilder : IMeshBuilder
                 
                 if (ix < xs || ix > xe || iy < ys || iy > ye) continue;
 
-                var value = _meshParameters.BoundaryFormulas[border.FormulaIndex](_points[j].X, _points[j].Y);
-                _dirichlet.Add(new Dirichlet(j, value));
+                _dirichlet.Add(new Dirichlet(j, _meshParameters.BoundaryFormulas[border.FormulaIndex]));
             }
         }
     }

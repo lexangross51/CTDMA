@@ -62,8 +62,7 @@ public class Assembler : BaseAssembler
 
                     return (_matrixGradI[0] * _matrixGradJ[0] + _matrixGradI[1] * _matrixGradJ[1]) * Math.Abs(jacobian);
                 }
-
-
+                
                 _stiffnessMatrix[i, j] = _stiffnessMatrix[j, i] = _integrator.Integrate2D(ScalarFunc, _masterElement);
             }
         }
@@ -100,6 +99,7 @@ public class Assembler : BaseAssembler
                     break;
                 
                 case BasisFunctionType.ByInnerNode:
+                    x = y = 0.0;
                     foreach (var node in nodes)
                     {
                         x += Mesh.Points[node].X;

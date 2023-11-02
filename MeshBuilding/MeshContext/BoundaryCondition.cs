@@ -3,9 +3,9 @@
 public struct Dirichlet
 {
     public int Node { get; }
-    public double Value { get; }
+    public Func<double, double, double> Value { get; }
 
-    public Dirichlet(int node, double value)
+    public Dirichlet(int node, Func<double, double, double> value)
     {
         Node = node;
         Value = value;

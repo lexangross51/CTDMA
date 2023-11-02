@@ -10,11 +10,13 @@ public class FemSolver
 {
     private readonly BaseAssembler _slaeAssembler;
     private readonly IterativeSolver _solver;
+    private readonly Mesh _mesh;
 
     public FemSolver(Mesh mesh, IBasis basis)
     {
         var basisInfo = Numerator.NumerateBasisFunctions(mesh, basis);
 
+        _mesh = mesh;
         _slaeAssembler = new Assembler(mesh, basis, basisInfo);
         _solver = new CGMCholesky(10_000, 1E-20);
     }
@@ -37,7 +39,12 @@ public class FemSolver
     
     private void ApplyNeumann()
     {
-        throw new NotImplementedException();
+        if (_mesh.Neumann is null || _mesh.Neumann.Length == 0) return;
+
+        foreach (var n in _mesh.Neumann)
+        {
+            
+        }
     }
 
     // private void ApplyDirichlet()
