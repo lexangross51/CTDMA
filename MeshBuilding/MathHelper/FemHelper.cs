@@ -90,4 +90,63 @@ public static class FemHelper
         jacobiMatrix[0, 1] = -jacobiMatrix[0, 1] / jacobian;
         jacobiMatrix[1, 0] = -jacobiMatrix[1, 0] / jacobian;
     }
+
+    public static void TryGetPointForBasisFunction(Mesh mesh, int ielem, BasisInfoItem bf, out double x, out double y)
+    {
+        var nodes = mesh.Elements[ielem].Nodes;
+        var edges = mesh.Elements[ielem].Edges;
+
+        switch (bf.Type)
+        {
+            case BasisFunctionType.ByGeometricNode:
+                x = mesh.Points[bf.Index].X;
+                y = mesh.Points[bf.Index].Y;
+                break;
+                
+            case BasisFunctionType.ByInnerNode:
+                x = y = 0.0;
+                foreach (var node in nodes)
+                {
+                    x += mesh.Points[node].X;
+                    y += mesh.Points[node].Y;
+                }
+
+                x /= nodes.Count;
+                y /= nodes.Count;
+                break;
+                
+            case BasisFunctionType.ByEdgeNode:
+                var edge = edges[bf.Index];
+                x = (mesh.Points[edge.Node1].X + mesh.Points[edge.Node2].X) / 2.0; 
+                y = (mesh.Points[edge.Node1].Y + mesh.Points[edge.Node2].Y) / 2.0; 
+                break;
+                
+            default: throw new ArgumentOutOfRangeException(nameof(bf.FunctionNumber), bf.FunctionNumber,
+                $"Function with number {bf.FunctionNumber} doesn't match interval");
+        }
+    }
+    
+    public static void TryGetPointForBasisFunction(Mesh mesh, BasisInfoCollection basisInfo, int globalNumber, out double x, out double y)
+    {
+        KeyValuePair<int, BasisInfoItem[]>? selectedElem = null;
+        BasisInfoItem? selectedFunction = null;
+
+        foreach (var elem in basisInfo)
+        {
+            BasisInfoItem? function = elem.Value.FirstOrDefault(f => f.FunctionNumber == globalNumber);
+            
+            if (function == null) continue;
+            
+            selectedElem = elem;
+            selectedFunction = function;
+            break;
+        }
+
+        if (selectedElem.HasValue)
+        {
+            TryGetPointForBasisFunction(mesh, selectedElem.Value.Key, selectedFunction!.Value, out x, out y);
+        }
+
+        x = y = 0.0;
+    }
 }

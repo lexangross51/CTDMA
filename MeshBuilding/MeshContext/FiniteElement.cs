@@ -4,9 +4,9 @@ namespace MeshBuilding.MeshContext;
 
 public class FiniteElement
 {
-    public IReadOnlyList<int> Nodes { get; }
+    public IList<int> Nodes { get; }
     public int AreaNumber { get; set; }
-    public IReadOnlyList<Edge> Edges { get; }
+    public IList<Edge> Edges { get; }
 
     public FiniteElement(int[] nodes, int areaNumber = 0)
     {

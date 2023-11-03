@@ -1,4 +1,5 @@
-﻿using MeshBuilding.FemContext;
+﻿using MeshBuilding;
+using MeshBuilding.FemContext;
 using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.Geometry;
 using MeshBuilding.MeshContext;
@@ -37,7 +38,7 @@ var meshParameters = new MeshParameters
     },
     Borders = new Border[]
     {
-        new(new[] { 0, 5 }, BoundaryType.Dirichlet, 1),
+        new(new[] { 0, 5 }, BoundaryType.Dirichlet, 0),
         new(new[] { 0, 12 }, BoundaryType.Dirichlet, 0),
         new(new[] { 5, 17 }, BoundaryType.Dirichlet, 0),
         new(new[] { 12, 17 }, BoundaryType.Dirichlet, 0),
@@ -50,7 +51,7 @@ var meshParameters = new MeshParameters
     },
     AreaProperties = new AreaProperty[]
     {
-        new(1.0, 0.0, (_, _) => 1.0 )
+        new(1.0, 0.0, (_, _) => 0.0 )
     },
     AbscissaSplits = new[] { 3, 2, 1, 2, 3 },
     AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
@@ -61,7 +62,7 @@ var meshParameters = new MeshParameters
 
 var meshManager = new MeshManager(new MeshBuilder(meshParameters));
 var mesh = meshManager.CreateMesh();
-// Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
+Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
 
 var femSolver = new FemSolver(mesh, new BiQuadraticBasis());
 femSolver.Solve();

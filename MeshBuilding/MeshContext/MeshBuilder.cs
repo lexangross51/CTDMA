@@ -13,7 +13,7 @@ public class MeshBuilder : IMeshBuilder
     private List<int> _fictitiousNodes;
     private List<int> _fictitiousElements;
     
-    private readonly HashSet<Dirichlet> _dirichlet;
+    private HashSet<Dirichlet> _dirichlet;
     private HashSet<Neumann>? _neumann;
 
     public MeshBuilder(MeshParameters meshParameters)
@@ -258,6 +258,8 @@ public class MeshBuilder : IMeshBuilder
                     break;
             }
         }
+
+        _dirichlet = _dirichlet.DistinctBy(d => d.Node).ToHashSet();
     }
 
     private void ProcessDirichletBoundary(Border border)
@@ -375,7 +377,7 @@ public class MeshBuilder : IMeshBuilder
         }
     }
 
-    public MeshContext.Mesh GetMesh()
+    public Mesh GetMesh()
     {
         return new MeshContext.Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
         {

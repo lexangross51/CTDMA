@@ -2,13 +2,19 @@
 
 public struct Dirichlet
 {
-    public int Node { get; }
+    public int Node { get; set; }
     public Func<double, double, double> Value { get; }
 
     public Dirichlet(int node, Func<double, double, double> value)
     {
         Node = node;
         Value = value;
+    }
+
+    public void Deconstruct(out int node, out Func<double, double, double> value)
+    {
+        node = Node;
+        value = Value;
     }
 }
 
