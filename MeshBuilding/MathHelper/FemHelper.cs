@@ -128,23 +128,15 @@ public static class FemHelper
     
     public static void TryGetPointForBasisFunction(Mesh mesh, BasisInfoCollection basisInfo, int globalNumber, out double x, out double y)
     {
-        KeyValuePair<int, BasisInfoItem[]>? selectedElem = null;
-        BasisInfoItem? selectedFunction = null;
-
         foreach (var elem in basisInfo)
         {
-            BasisInfoItem? function = elem.Value.FirstOrDefault(f => f.FunctionNumber == globalNumber);
-            
-            if (function == null) continue;
-            
-            selectedElem = elem;
-            selectedFunction = function;
-            break;
-        }
-
-        if (selectedElem.HasValue)
-        {
-            TryGetPointForBasisFunction(mesh, selectedElem.Value.Key, selectedFunction!.Value, out x, out y);
+            foreach (var f in elem.Value)
+            {
+                if (f.FunctionNumber != globalNumber) continue;
+                
+                TryGetPointForBasisFunction(mesh, elem.Key, f, out x, out y);
+                return;
+            }
         }
 
         x = y = 0.0;

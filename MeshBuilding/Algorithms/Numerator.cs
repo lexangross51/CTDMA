@@ -12,7 +12,7 @@ public static class Numerator
 
         for (var ielem = 0; ielem < mesh.Elements.Length; ielem++)
         {
-            int k = 2 * ielem / (nx - 1) * (2 * nx - 1) + 2 * (ielem % (nx - 1));
+            int k = 2 * (ielem / (nx - 1)) * (2 * nx - 1) + 2 * (ielem % (nx - 1));
             var nodes = mesh.Elements[ielem].Nodes;
 
             basisInfo[ielem, 0] = new BasisInfoItem(k, BasisFunctionType.ByGeometricNode, nodes[0]);

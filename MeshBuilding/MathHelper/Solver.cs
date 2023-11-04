@@ -179,6 +179,7 @@ public class CGMCholesky : IterativeSolver
 
         double rightPartNorm = RightPart.Norm();
         Solution = new double[RightPart.Length];
+        Array.Fill(Solution, 1.0);
         var r = new double[RightPart.Length];
         var z = new double[RightPart.Length];
         var result = new double[RightPart.Length];

@@ -46,12 +46,12 @@ var meshParameters = new MeshParameters
     },
     BoundaryFormulas = new Func<double, double, double>[]
     {
-        (x, y) => x + y,
+        (x, y) => x*x + y*y,
         (_, y) => y
     },
     AreaProperties = new AreaProperty[]
     {
-        new(1.0, 0.0, (_, _) => 0.0 )
+        new(1.0, 0.0, (_, _) => -4.0 )
     },
     AbscissaSplits = new[] { 3, 2, 1, 2, 3 },
     AbscissaK = new[] { -1.3, 1.0, 1.0, 1.0, 1.3 },
@@ -65,4 +65,6 @@ var mesh = meshManager.CreateMesh();
 Utilities.SaveMesh(mesh, @"C:\Users\lexan\source\repos\Python");
 
 var femSolver = new FemSolver(mesh, new BiQuadraticBasis());
-femSolver.Solve();
+var residual = femSolver.Solve();
+
+Console.WriteLine($"Residual: {residual}");

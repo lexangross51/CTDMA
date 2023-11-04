@@ -1,12 +1,13 @@
 ﻿using System.Globalization;
+using MeshBuilding.FemContext.BasisInfo;
+using MeshBuilding.MathHelper;
+using MeshBuilding.MeshContext;
 
 namespace MeshBuilding;
 
 public static class Utilities
 {
-    #region Write
-
-    public static void SaveMesh(MeshContext.Mesh mesh, string folder)
+    public static void SaveMesh(Mesh mesh, string folder)
     {
         // Points
         var sw = new StreamWriter($"{folder}/points");
@@ -50,7 +51,38 @@ public static class Utilities
         sw.Close();
     }
 
-    #endregion
+    public static void SaveBasisInfo(Mesh mesh, BasisInfoCollection basisInfo, string folder)
+    {
+        var functions = basisInfo
+            .SelectMany(e => e.Value
+                .Select(f => f.FunctionNumber))
+            .Distinct()
+            .OrderBy(f => f)
+            .ToList();
+        
+        using var sw = new StreamWriter($"{folder}/basisInfo");
+        
+        foreach (var bf in functions)
+        {
+            FemHelper.TryGetPointForBasisFunction(mesh, basisInfo, bf, out var x, out var y);
+            sw.WriteLine($"{x} {y}");
+        }
+        
+        sw.Close();
+    }
+    
+    public static void SaveBiQuadDirichlet(Mesh mesh, BasisInfoCollection basisInfo, IEnumerable<Dirichlet> dirichlet, string folder)
+    {
+        using var sw = new StreamWriter($"{folder}/dirichletBiQuad");
+        
+        foreach (var d in dirichlet)
+        {
+            FemHelper.TryGetPointForBasisFunction(mesh, basisInfo, d.Node, out var x, out var y);
+            sw.WriteLine($"{x} {y}");
+        }
+        
+        sw.Close();
+    }
 }
 
 public static class EnumerableExtensions
