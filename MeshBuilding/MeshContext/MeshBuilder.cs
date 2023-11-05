@@ -335,7 +335,7 @@ public class MeshBuilder : IMeshBuilder
                     // If point is not on the line
                     if (iy != ys || ix < xs || ix > xe) continue;
                     
-                    _neumann.Add(new Neumann(j, j + 1,
+                    _neumann.Add(new Neumann(new Edge(j, j + 1),
                         _meshParameters.BoundaryFormulas[border.FormulaIndex]));
                     
                     while (ix + 1 != xe)
@@ -343,7 +343,7 @@ public class MeshBuilder : IMeshBuilder
                         j++;
                         ix = j - iy * totalNx;
 
-                        _neumann.Add(new Neumann(j, j + 1, 
+                        _neumann.Add(new Neumann(new Edge(j, j + 1), 
                             _meshParameters.BoundaryFormulas[border.FormulaIndex]));
                     }
                     break;
@@ -360,7 +360,7 @@ public class MeshBuilder : IMeshBuilder
                     // If point is not on the line
                     if (ix != xs || iy < ys || iy > ye) continue;
                     
-                    _neumann.Add(new Neumann(j, j + totalNx,
+                    _neumann.Add(new Neumann(new Edge(j, j + totalNx),
                         _meshParameters.BoundaryFormulas[border.FormulaIndex]));
                     
                     while (iy + 1 != ye)
@@ -368,7 +368,7 @@ public class MeshBuilder : IMeshBuilder
                         j += totalNx;
                         iy = j / totalNx;
                         
-                        _neumann.Add(new Neumann(j, j + totalNx,
+                        _neumann.Add(new Neumann(new Edge(j, j + totalNx),
                             _meshParameters.BoundaryFormulas[border.FormulaIndex]));
                     }
                     break;
@@ -379,7 +379,7 @@ public class MeshBuilder : IMeshBuilder
 
     public Mesh GetMesh()
     {
-        return new MeshContext.Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
+        return new Mesh(_points, _elements, _meshParameters.AreaProperties, _dirichlet, _neumann)
         {
             FictitiousNodes = _fictitiousNodes.ToArray(),
             FictitiousElements = _fictitiousElements.ToArray()

@@ -16,8 +16,7 @@ public class FemSolver
     private readonly IterativeSolver _solver;
     private readonly Mesh _mesh;
     private readonly BasisInfoCollection _basisInfo;
-    private List<Dirichlet> _dirichlet;
-    private List<Neumann>? _neumann;
+    private List<Dirichlet>? _dirichlet;
     
     public FemSolver(Mesh mesh, IBasis basis)
     {
@@ -26,24 +25,26 @@ public class FemSolver
         _slaeAssembler = new Assembler(mesh, basis, _basisInfo);
         _boundaryHandler = new BoundaryHandler(mesh, _basisInfo);
         _solver = new CGMCholesky(10_000, 1E-20);
-
-        _dirichlet = new List<Dirichlet>();
         
         RenumerateDirichletNodes();
         RenumerateNeumannNodes();
 
-        Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet, @"C:\Users\lexan\source\repos\Python");
+        // Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet!, @"C:\Users\lexan\source\repos\Python");
+        // Utilities.SaveBiQuadNeumann(mesh, _basisInfo, _mesh.Neumann!, @"C:\Users\lexan\source\repos\Python");
     }
 
     private void RenumerateDirichletNodes()
     {
+        _dirichlet = new List<Dirichlet>();
+        
         // Edges on the outer border (only dirichlet edges)
         var dEdges = _mesh.Elements
             .SelectMany(elem => elem.Edges)
             .GroupBy(e => e)
             .Where(g => g.Count() == 1)
             .SelectMany(g => g)
-            .Where(e => _mesh.Dirichlet.Any(d => d.Node == e.Node1 || d.Node == e.Node2));
+            .Where(e => _mesh.Dirichlet.Any(d => d.Node == e.Node1)
+                        && _mesh.Dirichlet.Any(d => d.Node == e.Node2));
 
         var edgesPerElems = new Dictionary<int, List<Edge>>();
         
@@ -87,8 +88,36 @@ public class FemSolver
     private void RenumerateNeumannNodes()
     {
         if (_mesh.Neumann is null) return;
-
-        _neumann = new List<Neumann>();
+        
+        var edgesPerElems = new Dictionary<int, List<Edge>>();
+        
+        // Find elements for edges
+        foreach (var n in _mesh.Neumann)
+        {
+            var edge = n.Border;
+            int ielem = Array.FindIndex(_mesh.Elements, el => el.Edges.Contains(edge));
+            
+            if (!edgesPerElems.ContainsKey(ielem))
+                edgesPerElems.Add(ielem, new List<Edge>());
+            
+            edgesPerElems[ielem].Add(edge);
+        }
+        
+        foreach (var (ielem, edges) in edgesPerElems)
+        {
+            foreach (var edge in edges)
+            {
+                var bf1 = _basisInfo.GetFunctionAtNode(ielem, edge.Node1);
+                var bf2 = _basisInfo.GetFunctionAtNode(ielem, edge.Node2);
+                var index = Array.FindIndex(_mesh.Neumann, d => d.Border.Equal(edge));
+                var border = _mesh.Neumann[index].Border;
+                
+                border.Node1 = bf1.FunctionNumber;
+                border.Node2 = bf2.FunctionNumber;
+                
+                _mesh.Neumann[index].Border = border;
+            }
+        }
     }
     
     public double Solve()
@@ -105,15 +134,16 @@ public class FemSolver
 
     private void ApplyBoundaries(SparseMatrix matrix, double[] vector)
     {
-        if (_neumann is not null) 
-            _boundaryHandler.ApplyNeumann(_neumann, matrix, vector);
+        if (_mesh.Neumann is not null) 
+            _boundaryHandler.ApplyNeumann(_mesh.Neumann, vector);
         
-        _boundaryHandler.ApplyDirichlet(_dirichlet, matrix, vector);
+        _boundaryHandler.ApplyDirichlet(_dirichlet!, matrix, vector);
     }
 
+    // Only for analytical functions
     private double RootMeanSquare()
     {
-        var func = _dirichlet[0].Value;
+        var func = _dirichlet![0].Value;
         int count = _basisInfo.FunctionsCount;
         double dif = 0.0;
 

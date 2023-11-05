@@ -10,4 +10,8 @@ public struct Edge
         Node1 = node1;
         Node2 = node2;
     }
+
+    public bool Equal(Edge other)
+        => Node1 == other.Node1 && Node2 == other.Node2 ||
+           Node1 == other.Node2 && Node2 == other.Node1;
 }

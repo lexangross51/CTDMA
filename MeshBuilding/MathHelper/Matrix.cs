@@ -31,21 +31,23 @@ public class Matrix
         }
     }
     
-    public static void Dot(Matrix matrix, Vector vector, Vector? product)
+    public static void Dot(Matrix matrix, IEnumerable<double> vector, double[]? product)
     {
-        if (matrix.Columns != vector.Length)
+        var v = vector.ToArray();
+        
+        if (matrix.Columns != v.Length)
         {
             throw new Exception("Numbers of columns not equal to size of vector");
         }
 
-        product ??= new Vector(vector.Length);
-        product.Fill();
+        product ??= new double[v.Length];
+        Array.Fill(product, 0.0);
 
         for (int i = 0; i < matrix.Rows; i++)
         {
             for (int j = 0; j < matrix.Columns; j++)
             {
-                product[i] += matrix[i, j] * vector[j];
+                product[i] += matrix[i, j] * v[j];
             }
         }
     }

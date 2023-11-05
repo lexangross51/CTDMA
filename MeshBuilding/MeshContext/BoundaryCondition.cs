@@ -1,9 +1,11 @@
-﻿namespace MeshBuilding.MeshContext;
+﻿using MeshBuilding.Geometry;
+
+namespace MeshBuilding.MeshContext;
 
 public struct Dirichlet
 {
     public int Node { get; set; }
-    public Func<double, double, double> Value { get; }
+    public Func<double, double, double> Value { get; set; }
 
     public Dirichlet(int node, Func<double, double, double> value)
     {
@@ -20,14 +22,12 @@ public struct Dirichlet
 
 public struct Neumann
 {
-    public int BorderStart { get; }
-    public int BorderEnd { get; }
-    public Func<double, double, double> Theta { get; }
+    public Edge Border { get; set; }
+    public Func<double, double, double> Theta { get; set; }
 
-    public Neumann(int borderStart, int borderEnd, Func<double, double, double> theta)
+    public Neumann(Edge border, Func<double, double, double> theta)
     {
-        BorderStart = borderStart;
-        BorderEnd = borderEnd;
+        Border = border;
         Theta = theta;
     }
 }

@@ -16,5 +16,5 @@ public abstract class BaseBoundaryHandler
     }
 
     public abstract void ApplyDirichlet(IEnumerable<Dirichlet> dirichlet, SparseMatrix matrix, double[] vector);
-    public abstract void ApplyNeumann(IEnumerable<Neumann> neumann, SparseMatrix matrix, double[] vector);
+    public abstract void ApplyNeumann(IEnumerable<Neumann> neumann, double[] vector);
 }

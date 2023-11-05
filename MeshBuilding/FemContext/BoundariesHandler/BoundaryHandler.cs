@@ -7,8 +7,29 @@ namespace MeshBuilding.FemContext.BoundariesHandler;
 
 public class BoundaryHandler : BaseBoundaryHandler
 {
-    public BoundaryHandler(Mesh mesh, BasisInfoCollection basisInfo) 
-        : base(mesh, basisInfo) {}
+    private readonly Matrix _localMassMatrix;
+    private readonly double[] _thetaVector;
+    private readonly double[] _localVector;
+
+    public BoundaryHandler(Mesh mesh, BasisInfoCollection basisInfo)
+        : base(mesh, basisInfo)
+    {
+        _localMassMatrix = new Matrix(3, 3)
+        {
+            [0, 0] = 4.0 / 30.0,
+            [0, 1] = 2.0 / 30.0,
+            [0, 2] = -1.0 / 30.0,
+            [1, 0] = 2.0 / 30.0,
+            [1, 1] = 16.0 / 30.0,
+            [1, 2] = 2.0 / 30.0,
+            [2, 0] = -1.0 / 30.0,
+            [2, 1] = 2.0 / 30.0,
+            [2, 2] = 4.0 / 30.0,
+        };
+
+        _thetaVector = new double[3];
+        _localVector = new double[3];
+    }
     
     [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
     public override void ApplyDirichlet(IEnumerable<Dirichlet> dirichlet, SparseMatrix matrix, double[] vector)
@@ -64,8 +85,29 @@ public class BoundaryHandler : BaseBoundaryHandler
         }
     }
 
-    public override void ApplyNeumann(IEnumerable<Neumann> neumann, SparseMatrix matrix, double[] vector)
+    public override void ApplyNeumann(IEnumerable<Neumann> neumann, double[] vector)
     {
-        
+        foreach (var n in neumann)
+        {
+            int node1 = n.Border.Node1;
+            int node3 = n.Border.Node2;
+            int node2 = (node1 + node3) / 2;
+            
+            FemHelper.TryGetPointForBasisFunction(Mesh, BasisInfo, node1, out var x0, out var y0);
+            FemHelper.TryGetPointForBasisFunction(Mesh, BasisInfo, node2, out var x1, out var y1);
+            FemHelper.TryGetPointForBasisFunction(Mesh, BasisInfo, node3, out var x2, out var y2);
+            
+            _thetaVector[0] = n.Theta(x0, y0);
+            _thetaVector[1] = n.Theta(x1, y1);
+            _thetaVector[2] = n.Theta(x2, y2);
+
+            double len = Math.Sqrt((x2 - x0) * (x2 - x0) + (y2 - y0) * (y2 - y0));
+            
+            Matrix.Dot(_localMassMatrix, _thetaVector, _localVector);
+
+            vector[node1] += len * _localVector[0];
+            vector[node2] += len * _localVector[1];
+            vector[node3] += len * _localVector[2];
+        }
     }
 }

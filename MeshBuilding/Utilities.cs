@@ -43,10 +43,10 @@ public static class Utilities
         sw = new StreamWriter($"{folder}/neumann");
         foreach (var n in mesh.Neumann)
         {
-            var p1 = mesh.Points[n.BorderStart];
-            var p2 = mesh.Points[n.BorderEnd];
+            var p1 = mesh.Points[n.Border.Node1];
+            var p2 = mesh.Points[n.Border.Node2];
             
-            sw.WriteLine($"{n.BorderStart} {n.BorderEnd} {n.Theta(p1.X, p1.Y)} {n.Theta(p2.X, p2.Y)}");
+            sw.WriteLine($"{n.Border.Node1} {n.Border.Node2} {n.Theta(p1.X, p1.Y)} {n.Theta(p2.X, p2.Y)}");
         }
         sw.Close();
     }
@@ -79,6 +79,20 @@ public static class Utilities
         {
             FemHelper.TryGetPointForBasisFunction(mesh, basisInfo, d.Node, out var x, out var y);
             sw.WriteLine($"{x} {y}");
+        }
+        
+        sw.Close();
+    }
+    
+    public static void SaveBiQuadNeumann(Mesh mesh, BasisInfoCollection basisInfo, IEnumerable<Neumann> neumann, string folder)
+    {
+        using var sw = new StreamWriter($"{folder}/neumannBiQuad");
+        
+        foreach (var n in neumann)
+        {
+            FemHelper.TryGetPointForBasisFunction(mesh, basisInfo, n.Border.Node1, out var x0, out var y0);
+            FemHelper.TryGetPointForBasisFunction(mesh, basisInfo, n.Border.Node2, out var x1, out var y1);
+            sw.WriteLine($"{x0} {y0} {x1} {y1}");
         }
         
         sw.Close();

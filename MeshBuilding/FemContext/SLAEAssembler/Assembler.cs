@@ -16,8 +16,8 @@ public class Assembler : BaseAssembler
     private readonly double[] _localRightPart;
     private readonly Vector _gradPhiI = new(2);
     private readonly Vector _gradPhiJ = new(2);
-    private readonly Vector _matrixGradI = new(2);
-    private readonly Vector _matrixGradJ = new(2);
+    private readonly double[] _matrixGradI = new double[2];
+    private readonly double[] _matrixGradJ = new double[2];
     private readonly Rectangle _masterElement = new(new Point(), new Point(1, 1));
 
     public Assembler(Mesh mesh, IBasis basis, BasisInfoCollection basisInfo)
@@ -35,8 +35,7 @@ public class Assembler : BaseAssembler
     {
         var element = Mesh.Elements[ielem];
         var nodes = element.Nodes;
-        double x = 0.0, y = 0.0;
-        
+
         for (int i = 0; i < Basis.BasisSize; i++)
         {
             int i1 = i;
@@ -89,7 +88,9 @@ public class Assembler : BaseAssembler
         var source = Mesh.Materials[Mesh.Elements[ielem].AreaNumber].Source;
         for (int i = 0; i < Basis.BasisSize; i++)
         {
+            double x, y;
             var bf = BasisInfo[ielem, i];
+            
             switch (bf.Type)
             {
                 case BasisFunctionType.ByGeometricNode:
