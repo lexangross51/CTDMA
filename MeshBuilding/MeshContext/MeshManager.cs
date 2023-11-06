@@ -9,7 +9,7 @@ public class MeshManager
     public MeshManager(IMeshBuilder meshBuilder)
         => _meshBuilder = meshBuilder;
 
-    public MeshContext.Mesh CreateMesh()
+    public Mesh CreateMesh()
     {
         _meshBuilder.CreatePoints();
         _meshBuilder.CreateElements();

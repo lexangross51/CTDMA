@@ -2,11 +2,21 @@
 using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.MathHelper;
 using MeshBuilding.MeshContext;
+using System.Linq.Expressions;
 
 namespace MeshBuilding;
 
 public static class Utilities
 {
+    public static Func<double, double, double> GetFunctionFromString(string expression)
+    {
+        var x = Expression.Parameter(typeof(double), "x");
+        var y = Expression.Parameter(typeof(double), "y");
+        var body = System.Linq.Dynamic.Core.DynamicExpressionParser.ParseLambda(new[] { x, y }, null, expression).Body;
+
+        return Expression.Lambda<Func<double, double, double>>(body, x, y).Compile();
+    }
+    
     public static void SaveMesh(Mesh mesh, string folder)
     {
         // Points

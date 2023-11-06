@@ -21,6 +21,9 @@ public class FemSolver
     public FemSolver(Mesh mesh, IBasis basis)
     {
         _basisInfo = Numerator.NumerateBasisFunctions(mesh, basis);
+        
+        Utilities.SaveBasisInfo(mesh, _basisInfo, @"C:\Users\lexan\source\repos\Python");
+        
         _mesh = mesh;
         _slaeAssembler = new Assembler(mesh, basis, _basisInfo);
         _boundaryHandler = new BoundaryHandler(mesh, _basisInfo);
@@ -29,8 +32,9 @@ public class FemSolver
         RenumerateDirichletNodes();
         RenumerateNeumannNodes();
 
-        // Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet!, @"C:\Users\lexan\source\repos\Python");
-        // Utilities.SaveBiQuadNeumann(mesh, _basisInfo, _mesh.Neumann!, @"C:\Users\lexan\source\repos\Python");
+        Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet!, @"C:\Users\lexan\source\repos\Python");
+        if (_mesh.Neumann != null)
+            Utilities.SaveBiQuadNeumann(mesh, _basisInfo, _mesh.Neumann, @"C:\Users\lexan\source\repos\Python");
     }
 
     private void RenumerateDirichletNodes()

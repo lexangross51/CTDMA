@@ -1,0 +1,80 @@
+﻿{
+  "AbscissaPointsCount": 6,
+  "OrdinatePointsCount": 3,
+  "ControlPoints": [
+    "Point(0.0, 0.0)",
+    "Point(2.0, 0.0)",
+    "Point(4.0, 0.0)",
+    "Point(5.0, 0.0)",
+    "Point(7.0, 0.0)",
+    "Point(9.0, 0.0)",
+    "Point(0.0, 4.0)",
+    "Point(2.0, 4.0)",
+    "Point(4.0, 3.0)",
+    "Point(5.0, 3.0)",
+    "Point(7.0, 4.0)",
+    "Point(9.0, 4.0)",
+    "Point(0.0, 6.0)",
+    "Point(2.0, 6.0)",
+    "Point(4.0, 6.0)",
+    "Point(5.0, 6.0)",
+    "Point(7.0, 6.0)",
+    "Point(9.0, 6.0)"
+  ],
+  "Areas": [
+    {
+      "ParameterNumber": 0,
+      "BordersIndices": [0, 1, 0, 2]
+    },
+    {
+      "ParameterNumber": 0,
+      "BordersIndices": [1, 4, 0, 1]
+    },
+    {
+      "ParameterNumber": 0,
+      "BordersIndices": [4, 5, 0, 2]
+    },
+    {
+      "ParameterNumber": 0,
+      "BordersIndices": [1, 4, 1, 2]
+    }
+  ],
+  "Borders": [
+    {
+      "PointsIndices": [0, 5],
+      "BoundaryType": 1,
+      "FormulaIndex": 0
+    },
+    {
+      "PointsIndices": [0, 12],
+      "BoundaryType": 1,
+      "FormulaIndex": 0
+    },
+    {
+      "PointsIndices": [5, 17],
+      "BoundaryType": 1,
+      "FormulaIndex": 0
+    },
+    {
+      "PointsIndices": [12, 17],
+      "BoundaryType": 2,
+      "FormulaIndex": 1
+    }
+  ],
+  "BoundaryFormulas": [
+    "f(x, y) = x*x + y*y",
+    "f(x, y) = 2*y"
+  ],
+  "AreaProperties": [
+    {
+      "Lambda": 1.0,
+      "Gamma": 0.0,
+      "F": "f(x, y) = -4.0"
+    }
+  ],
+  "AbscissaSplits": [3, 2, 1, 2, 3],
+  "OrdinateSplits": [4, 2],
+  "AbscissaK": [-1.3, 1.0, 1.0, 1.0, 1.3],
+  "OrdinateK": [-1.5, 1.5],
+  "Refinement": 0
+}

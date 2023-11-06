@@ -1,14 +1,16 @@
 ﻿using MeshBuilding.Geometry;
+using MeshBuilding.MeshContext.JsonConverter;
+using Newtonsoft.Json;
 
 namespace MeshBuilding.MeshContext;
 
 public struct Area
 {
-    public int ParameterNumber { get; init; }
-    public int LeftBorderNumber { get; init; }
-    public int RightBorderNumber { get; init; }
-    public int BottomBorderNumber { get; init; }
-    public int TopBorderNumber { get; init; }
+    public int ParameterNumber { get; set; }
+    public int LeftBorderNumber { get; set; }
+    public int RightBorderNumber { get; set; }
+    public int BottomBorderNumber { get; set; }
+    public int TopBorderNumber { get; set; }
 
     public Area(int leftBorderNumber, int rightBorderNumber, int bottomBorderNumber, int topBorderNumber, int parameterNumber)
     {
@@ -34,6 +36,7 @@ public class Border
     }
 }
 
+[JsonConverter(typeof(MeshParametersJsonConverter))]
 public class MeshParameters
 {
     public int AbscissaPointsCount { get; init; }
@@ -48,4 +51,10 @@ public class MeshParameters
     public double[] AbscissaK { get; init; } = null!;
     public double[] OrdinateK { get; init; } = null!;
     public int Refinement { get; init; }
+
+    public static MeshParameters ReadJson(string path)
+    {
+        using var sr = new StreamReader(path);
+        return JsonConvert.DeserializeObject<MeshParameters>(sr.ReadToEnd());
+    }
 }
