@@ -5,6 +5,42 @@
         <TargetFramework>net7.0-windows</TargetFramework>
         <Nullable>enable</Nullable>
         <UseWPF>true</UseWPF>
+        <UseWindowsForms>True</UseWindowsForms>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\MeshBuilding\MeshBuilding.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Core\Graphics\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OpenTK.GLWpfControl" Version="4.2.3" />
+      <PackageReference Include="Speckle.Triangle" Version="1.0.0" />
+      <PackageReference Include="StbImageSharp" Version="2.27.13" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Core\Graphics\Shaders\FieldShader.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Core\Graphics\Shaders\FieldShader.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Core\Graphics\Shaders\LineShader.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Core\Graphics\Shaders\LineShader.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Core\Graphics\Shaders\TextShader.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="Core\Graphics\Shaders\TextShader.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 
 </Project>

@@ -3,9 +3,68 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:scene="clr-namespace:FieldsDrawer.Core.Graphics.Scene"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
+        Title="Fields drawer" Height="450" Width="900"
+        SizeChanged="MainWindowOnSizeChanged">
+    <Grid x:Name="MainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <scene:GraphicControl x:Name="GraphicControl" Grid.Column="0" Width="600" Height="400"/>
+        
+        <StackPanel Grid.Column="1" Margin="0, 5, 5, 0">
+            <Expander Header="Elliptic problem" IsExpanded="True">
+                <DockPanel>
+                    <Button Content="Build mesh" Height="20" Width="70"/>
+                    <Button Content="Solve fem" Height="20" Width="70"/>
+                </DockPanel>
+            </Expander>
+            
+            <Expander Header="Mesh render settings" IsExpanded="True" Margin="0, 5">
+                <StackPanel>
+                    <GroupBox Header="Mesh">
+                        <StackPanel>
+                            <CheckBox Content="Draw nodes numbers"/>
+                            <CheckBox Content="Draw elements numbers"/>
+                            <CheckBox Content="Draw basis numbers"/>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                    <GroupBox Header="Boundaries">
+                        <StackPanel>
+                            <CheckBox Content="Draw dirichlet nodes"/>
+                            <CheckBox Content="Draw neumann edges"/>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Expander>
+            
+            <Expander Header="Field render settings" IsExpanded="True">
+                <StackPanel>
+                    <GroupBox Header="Colormap">
+                        <StackPanel>
+                            <CheckBox x:Name="DrawIsolinesCheckBox" Content="Draw isolines"/>
+                            <DockPanel>
+                                <TextBlock Text="Isolines count"/>
+                                <TextBox Text="" Margin="5, 0"
+                                         IsEnabled="{Binding ElementName=DrawIsolinesCheckBox, Path=IsChecked}"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
 
+                    <GroupBox Header="Mesh">
+                        <StackPanel>
+                            <CheckBox x:Name="DrawTriMeshCheckBox" Content="Draw triangle mesh"/>
+                            <DockPanel>
+                                <TextBlock Text="Refinement"/>
+                                <TextBox Text="" Margin="5, 0" IsEnabled="{Binding ElementName=DrawTriMeshCheckBox, Path=IsChecked}"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </GroupBox>
+                </StackPanel>
+            </Expander>
+        </StackPanel>
     </Grid>
 </Window>
