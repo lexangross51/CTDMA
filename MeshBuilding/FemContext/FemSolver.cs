@@ -154,17 +154,7 @@ public class FemSolver
     {
         var func = _dirichlet![0].Value;
         double dif = 0.0;
-
-        // for (int i = 0; i < count; i++)
-        // {
-        //     FemHelper.TryGetPointForBasisFunction(_mesh, _basisInfo, i, out var x, out var y);
-        //     double value = func(x, y);
-        //
-        //     dif += (value - _solver.Solution![i]) * (value - _solver.Solution![i]);
-        // }
-        //
-        // return Math.Sqrt(dif / count);
-
+        
         foreach (var p in points)
         {
             double exact = func(p.X, p.Y);
