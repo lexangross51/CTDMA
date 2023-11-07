@@ -31,8 +31,10 @@ public class Vector : IEnumerable<double>
     public static double Dot(double[] a, double[] b)
         => a.Select((t, i) => t * b[i]).Sum();
 
-    public static void Copy(Vector source, Vector destination)
+    public static void Copy(Vector source, Vector? destination)
     {
+        destination ??= new Vector(source.Length);
+        
         for (int i = 0; i < source.Length; i++)
         {
             destination[i] = source[i];

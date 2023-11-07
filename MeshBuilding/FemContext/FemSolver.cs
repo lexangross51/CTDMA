@@ -1,4 +1,5 @@
-﻿using MeshBuilding.Algorithms;
+﻿using System.Diagnostics.CodeAnalysis;
+using MeshBuilding.Algorithms;
 using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.FemContext.BasisInfo.Interfaces;
 using MeshBuilding.FemContext.BoundariesHandler;
@@ -16,13 +17,16 @@ public class FemSolver
     private readonly IterativeSolver _solver;
     private readonly Mesh _mesh;
     private readonly BasisInfoCollection _basisInfo;
+    private readonly IBasis _basis;
     private List<Dirichlet>? _dirichlet;
+    private readonly Newton _newton;
     
     public FemSolver(Mesh mesh, IBasis basis)
     {
+        _basis = basis;
         _basisInfo = Numerator.NumerateBasisFunctions(mesh, basis);
         
-        Utilities.SaveBasisInfo(mesh, _basisInfo, @"C:\Users\lexan\source\repos\Python");
+        // Utilities.SaveBasisInfo(mesh, _basisInfo, @"C:\Users\lexan\source\repos\Python");
         
         _mesh = mesh;
         _slaeAssembler = new Assembler(mesh, basis, _basisInfo);
@@ -32,9 +36,11 @@ public class FemSolver
         RenumerateDirichletNodes();
         RenumerateNeumannNodes();
 
-        Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet!, @"C:\Users\lexan\source\repos\Python");
-        if (_mesh.Neumann != null)
-            Utilities.SaveBiQuadNeumann(mesh, _basisInfo, _mesh.Neumann, @"C:\Users\lexan\source\repos\Python");
+        _newton = new Newton(_mesh, _basis, _basisInfo);
+
+        // Utilities.SaveBiQuadDirichlet(mesh, _basisInfo, _dirichlet!, @"C:\Users\lexan\source\repos\Python");
+        // if (_mesh.Neumann != null)
+        //     Utilities.SaveBiQuadNeumann(mesh, _basisInfo, _mesh.Neumann, @"C:\Users\lexan\source\repos\Python");
     }
 
     private void RenumerateDirichletNodes()
@@ -124,7 +130,7 @@ public class FemSolver
         }
     }
     
-    public double Solve()
+    public void Solve()
     {
         var slae = _slaeAssembler.GetSlae();
 
@@ -132,8 +138,6 @@ public class FemSolver
         
         _solver.SetSystem(slae.Matrix, slae.Vector);
         _solver.Compute();
-
-        return RootMeanSquare();
     }
 
     private void ApplyBoundaries(SparseMatrix matrix, double[] vector)
@@ -145,20 +149,121 @@ public class FemSolver
     }
 
     // Only for analytical functions
-    private double RootMeanSquare()
+    [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+    public double RootMeanSquare(IEnumerable<Point> points)
     {
         var func = _dirichlet![0].Value;
-        int count = _basisInfo.FunctionsCount;
         double dif = 0.0;
 
-        for (int i = 0; i < count; i++)
-        {
-            FemHelper.TryGetPointForBasisFunction(_mesh, _basisInfo, i, out var x, out var y);
-            double value = func(x, y);
+        // for (int i = 0; i < count; i++)
+        // {
+        //     FemHelper.TryGetPointForBasisFunction(_mesh, _basisInfo, i, out var x, out var y);
+        //     double value = func(x, y);
+        //
+        //     dif += (value - _solver.Solution![i]) * (value - _solver.Solution![i]);
+        // }
+        //
+        // return Math.Sqrt(dif / count);
 
-            dif += (value - _solver.Solution![i]) * (value - _solver.Solution![i]);
+        foreach (var p in points)
+        {
+            double exact = func(p.X, p.Y);
+            double numeric = ValueAtPoint(p);
+
+            dif += (exact - numeric) * (exact - numeric);
         }
 
-        return Math.Sqrt(dif / count);
+        return Math.Sqrt(dif / points.Count());
+    }
+    
+    public double ValueAtPoint(Point point)
+    {
+        int ielem = FindNumberElement(point);
+        var result = 0.0;
+
+        _newton.Point = point;
+        _newton.NumberElement = ielem;
+
+        _newton.Compute();
+
+        for (int i = 0; i < _basis.BasisSize; i++)
+        {
+            var p = _newton.Result;
+            var index = _basisInfo[ielem, i].FunctionNumber;
+            result += _solver.Solution![index] * _basis.Phi(i, p.X, p.Y);
+        }
+
+        return result;
+    }
+    
+     private int FindNumberElement(Point point)
+    {
+        const double floatEps = 1E-07;
+        const double eps = 1E-05;
+
+        for (int ielem = 0; ielem < _mesh.Elements.Length; ielem++)
+        {
+            var element = _mesh.Elements[ielem];
+
+            var intersectionCounter = 0;
+
+            var edges = new List<(Point, Point)>
+            {
+                (_mesh.Points[element.Nodes[0]], _mesh.Points[element.Nodes[1]]),
+                (_mesh.Points[element.Nodes[1]], _mesh.Points[element.Nodes[3]]),
+                (_mesh.Points[element.Nodes[3]], _mesh.Points[element.Nodes[2]]),
+                (_mesh.Points[element.Nodes[2]], _mesh.Points[element.Nodes[0]])
+            };
+
+            foreach (var edge in edges)
+            {
+                if (OnEdge(edge)) return ielem;
+
+                var pt = point;
+                (Point A, Point B) sortedEdge = edge.Item1.Y > edge.Item2.Y ? (edge.Item2, edge.Item1) : edge;
+
+                if (Math.Abs(pt.Y - sortedEdge.A.Y) < floatEps || Math.Abs(pt.Y - sortedEdge.B.Y) < floatEps)
+                {
+                    pt = pt with { Y = pt.Y + eps };
+                }
+
+                var maxX = edge.Item1.X > edge.Item2.X ? edge.Item1.X : edge.Item2.X;
+                var minX = edge.Item1.X < edge.Item2.X ? edge.Item1.X : edge.Item2.X;
+
+                if (pt.Y > sortedEdge.B.Y || pt.Y < sortedEdge.A.Y || pt.X > maxX) continue;
+
+                if (pt.X < minX)
+                {
+                    intersectionCounter++;
+                }
+                else
+                {
+                    var mRed = Math.Abs(sortedEdge.A.X - sortedEdge.B.X) > uint.MinValue
+                        ? (sortedEdge.B.Y - sortedEdge.A.Y) / (sortedEdge.B.X - sortedEdge.A.X)
+                        : double.PositiveInfinity;
+                    var mBlue = Math.Abs(sortedEdge.A.X - pt.X) > uint.MinValue
+                        ? (pt.Y - sortedEdge.A.Y) / (pt.X - sortedEdge.A.X)
+                        : double.PositiveInfinity;
+
+                    if (mBlue >= mRed) intersectionCounter++;
+                }
+            }
+
+            if (intersectionCounter % 2 == 1) return ielem;
+
+            bool OnEdge((Point, Point) edge)
+            {
+                var distance1 = Math.Sqrt((point.X - edge.Item1.X) * (point.X - edge.Item1.X) +
+                                          (point.Y - edge.Item1.Y) * (point.Y - edge.Item1.Y));
+                var distance2 = Math.Sqrt((point.X - edge.Item2.X) * (point.X - edge.Item2.X) +
+                                          (point.Y - edge.Item2.Y) * (point.Y - edge.Item2.Y));
+                var edgeLenght = Math.Sqrt((edge.Item2.X - edge.Item1.X) * (edge.Item2.X - edge.Item1.X) +
+                                           (edge.Item2.Y - edge.Item1.Y) * (edge.Item2.Y - edge.Item1.Y));
+
+                return Math.Abs(distance1 + distance2 - edgeLenght) < floatEps;
+            }
+        }
+
+        throw new("Not support exception!");
     }
 }
