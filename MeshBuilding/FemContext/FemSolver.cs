@@ -20,6 +20,8 @@ public class FemSolver
     private readonly IBasis _basis;
     private List<Dirichlet>? _dirichlet;
     private readonly Newton _newton;
+
+    public IEnumerable<double>? Solution => _solver.Solution;
     
     public FemSolver(Mesh mesh, IBasis basis)
     {
@@ -158,7 +160,7 @@ public class FemSolver
         foreach (var p in points)
         {
             double exact = func(p.X, p.Y);
-            double numeric = ValueAtPoint(p);
+            double numeric = ValueAtPoint(p.X, p.Y);
 
             dif += (exact - numeric) * (exact - numeric);
         }
@@ -166,9 +168,13 @@ public class FemSolver
         return Math.Sqrt(dif / points.Count());
     }
     
-    public double ValueAtPoint(Point point)
+    public double ValueAtPoint(double x, double y)
     {
+        var point = new Point(x, y);
         int ielem = FindNumberElement(point);
+
+        if (ielem == -1) return double.MinValue;
+        
         var result = 0.0;
 
         _newton.Point = point;
@@ -188,7 +194,7 @@ public class FemSolver
     
      private int FindNumberElement(Point point)
     {
-        const double floatEps = 1E-07;
+        const double floatEps = 1E-04;
         const double eps = 1E-05;
 
         for (int ielem = 0; ielem < _mesh.Elements.Length; ielem++)
@@ -254,6 +260,6 @@ public class FemSolver
             }
         }
 
-        throw new("Not support exception!");
+        return -1;
     }
 }

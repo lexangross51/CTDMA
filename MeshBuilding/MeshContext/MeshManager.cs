@@ -4,16 +4,18 @@ namespace MeshBuilding.MeshContext;
 
 public class MeshManager
 {
-    private readonly IMeshBuilder _meshBuilder;
+    public IMeshBuilder? MeshBuilder { get; set; }
 
+    public MeshManager() { }
+    
     public MeshManager(IMeshBuilder meshBuilder)
-        => _meshBuilder = meshBuilder;
+        => MeshBuilder = meshBuilder;
 
     public Mesh CreateMesh()
     {
-        _meshBuilder.CreatePoints();
-        _meshBuilder.CreateElements();
-        _meshBuilder.CreateBoundaries();
-        return _meshBuilder.GetMesh();
+        MeshBuilder!.CreatePoints();
+        MeshBuilder.CreateElements();
+        MeshBuilder.CreateBoundaries();
+        return MeshBuilder.GetMesh();
     }
 }

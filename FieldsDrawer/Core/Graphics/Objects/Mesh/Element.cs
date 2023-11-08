@@ -1,4 +1,4 @@
-﻿namespace BicubicHermite.Core.Graphics.Objects.Mesh;
+﻿namespace FieldsDrawer.Core.Graphics.Objects.Mesh;
 
 public class Element
 {

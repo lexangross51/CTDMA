@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BicubicHermite.Core.Graphics.Objects.Mesh;
+using FieldsDrawer.Core.Graphics.Objects.Mesh;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using TriangleNet;
@@ -16,7 +16,7 @@ public class Contour : IBaseObject
     public Point[] Points { get; }
     public Color4[] Colors { get; }
     public uint[]? Indices { get; }
-    public BicubicHermite.Core.Graphics.Objects.Mesh.Mesh Mesh { get; } 
+    public Mesh.Mesh Mesh { get; } 
 
     public Contour(IEnumerable<Point> pointsCollection, IEnumerable<double> values, int levels = 5)
     {
@@ -58,7 +58,7 @@ public class Contour : IBaseObject
         rightTop = new Point(maxX, maxY);
     }
 
-    private BicubicHermite.Core.Graphics.Objects.Mesh.Mesh ToSharpPlotMesh(IMesh mesh)
+    private Mesh.Mesh ToSharpPlotMesh(IMesh mesh)
     {
         var points = new Point[mesh.Vertices.Count];
         var triangles = new Element[mesh.Triangles.Count];
@@ -81,6 +81,6 @@ public class Contour : IBaseObject
             });
         }
 
-        return new BicubicHermite.Core.Graphics.Objects.Mesh.Mesh(points, triangles);
+        return new Mesh.Mesh(points, triangles);
     }
 }

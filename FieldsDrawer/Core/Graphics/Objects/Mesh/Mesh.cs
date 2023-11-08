@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using FieldsDrawer.Core.Graphics.Objects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace BicubicHermite.Core.Graphics.Objects.Mesh;
+namespace FieldsDrawer.Core.Graphics.Objects.Mesh;
 
 public class Mesh : IBaseObject
 {

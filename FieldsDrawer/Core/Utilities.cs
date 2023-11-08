@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using BicubicHermite.Core.Graphics.Objects.Mesh;
+using FieldsDrawer.Core.Graphics.Objects.Mesh;
 using FieldsDrawer.Core.Graphics.Palette;
 using OpenTK.Mathematics;
 using TriangleNet.Geometry;
-using Edge = BicubicHermite.Core.Graphics.Objects.Mesh.Edge;
+using Edge = FieldsDrawer.Core.Graphics.Objects.Mesh.Edge;
 using Point = FieldsDrawer.Core.Graphics.Objects.Point;
 
 namespace FieldsDrawer.Core;

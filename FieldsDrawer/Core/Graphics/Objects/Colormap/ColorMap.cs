@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using BicubicHermite.Core.Graphics.Objects;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
@@ -14,7 +13,7 @@ public class ColorMap : IBaseObject
     public Color4[] Colors { get; }
     public uint[]? Indices { get; }
     
-    public ColorMap(BicubicHermite.Core.Graphics.Objects.Mesh.Mesh mesh, IEnumerable<double> valuesCollection, Palette.Palette palette, 
+    public ColorMap(Mesh.Mesh mesh, IEnumerable<double> valuesCollection, Palette.Palette palette, 
         ColorInterpolationType interpolation = ColorInterpolationType.Linear)
     {
         ObjectType = mesh.ObjectType;

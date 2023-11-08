@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using FieldsDrawer.Core.Graphics.RenderContext;
 
-namespace FieldsDrawer;
+namespace FieldsDrawer.Views;
 
 public partial class MainWindow
 {
