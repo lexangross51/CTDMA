@@ -18,7 +18,6 @@ public class BaseGraphic2D : IRenderContext
     private RenderSettings _renderSettings;
     
     private readonly Dictionary<IBaseObject, VertexArrayObject> _context;
-
     
     public BaseGraphic2D(RenderSettings renderSettings, Camera2D camera)
     {
@@ -203,8 +202,17 @@ public class BaseGraphic2D : IRenderContext
         GL.PointSize(1);
     }
 
-    public void DeleteObject(IBaseObject obj)
+    public bool DeleteObject(IBaseObject obj)
     {
+        if (!_context.ContainsKey(obj))
+            return false;
+        
         _context.Remove(obj);
+        return true;
+    }
+
+    public void ClearView()
+    {
+        _context.Clear();
     }
 }

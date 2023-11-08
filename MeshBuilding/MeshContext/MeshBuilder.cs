@@ -16,6 +16,8 @@ public class MeshBuilder : IMeshBuilder
     private HashSet<Dirichlet> _dirichlet;
     private HashSet<Neumann>? _neumann;
 
+    public IEnumerable<Point> Points { get; set; } = null!;
+
     public MeshBuilder(MeshParameters meshParameters)
     {
         _meshParameters = meshParameters;
@@ -55,7 +57,7 @@ public class MeshBuilder : IMeshBuilder
                                                1.0 / Math.Pow(2, _meshParameters.Refinement));
         }
     }
-    
+
     public void CreatePoints()
     {
         int totalNx = _meshParameters.AbscissaSplits.Sum() + 1;  // Nodes count on abscissa with splits
@@ -180,6 +182,8 @@ public class MeshBuilder : IMeshBuilder
         {
             _iy[i] = _iy[i - 1] + _meshParameters.OrdinateSplits[i - 1];
         }
+
+        Points = _points;
     }
 
     public void CreateElements()

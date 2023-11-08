@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FieldsDrawer.Core;
-using FieldsDrawer.Core.Graphics.Objects;
+using FieldsDrawer.Core.Graphics.Colorbar;
 using FieldsDrawer.Core.Graphics.Objects.Colormap;
 using FieldsDrawer.Core.Graphics.Objects.Contour;
 using FieldsDrawer.Core.Graphics.Objects.Mesh;
@@ -13,6 +14,7 @@ using MeshBuilding.FemContext.BasisInfo;
 using MeshBuilding.MeshContext;
 using TriangleNet;
 using Mesh = MeshBuilding.MeshContext.Mesh;
+using Point = FieldsDrawer.Core.Graphics.Objects.Point;
 
 namespace FieldsDrawer.ViewModels;
 
@@ -22,7 +24,9 @@ public class MainViewModel : NotifyObject
     private Mesh? _femMesh;
     private Core.Graphics.Objects.Mesh.Mesh? _mesh;
     private Contour? _contour;
+    private ColorMap? _colorMap;
     private FemSolver? _femSolver;
+    private Colorbar? _colorbar;
 
     private List<Point>? _points;
     private List<double>? _values;
@@ -31,6 +35,7 @@ public class MainViewModel : NotifyObject
     private bool _isAbleToDrawMesh;
     private int _meshRefinement;
     private int _isolinesCount;
+    private MeshParameters? _meshParameters;
 
     public int MeshRefinement
     {
@@ -54,6 +59,9 @@ public class MainViewModel : NotifyObject
     public RelayCommand DrawFemMeshCommand { get; } = null!;
     public RelayCommand DrawIsolinesCommand { get; } = null!;
     public RelayCommand DrawTriMeshCommand { get; } = null!;
+    public RelayCommand ConfirmRefinement { get; } = null!;
+    public RelayCommand ConfirmIsolinesCount { get; } = null!;
+    public RelayCommand ClearViewCommand { get; } = null!;
 
     public MainViewModel()
     {
@@ -68,16 +76,16 @@ public class MainViewModel : NotifyObject
             
             if (filename is null) return;
 
-            var meshParameters = MeshParameters.ReadJson(filename);
+            _meshParameters = MeshParameters.ReadJson(filename);
 
-            _nx = 2 * meshParameters.AbscissaSplits.Sum() - 1;
-            _ny = 2 * meshParameters.OrdinateSplits.Sum() - 1;
-            _xMin = meshParameters.ControlPoints.Min(p => p.X);
-            _yMin = meshParameters.ControlPoints.Min(p => p.Y);
-            _xMax = meshParameters.ControlPoints.Max(p => p.X);
-            _yMax = meshParameters.ControlPoints.Max(p => p.Y);
+            _nx = 2 * _meshParameters.AbscissaSplits.Sum() - 1;
+            _ny = 2 * _meshParameters.OrdinateSplits.Sum() - 1;
+            _xMin = _meshParameters.ControlPoints.Min(p => p.X);
+            _yMin = _meshParameters.ControlPoints.Min(p => p.Y);
+            _xMax = _meshParameters.ControlPoints.Max(p => p.X);
+            _yMax = _meshParameters.ControlPoints.Max(p => p.Y);
             
-            _meshManager.MeshBuilder = new MeshBuilder(meshParameters);
+            _meshManager.MeshBuilder = new MeshBuilder(_meshParameters);
             _femMesh = _meshManager.CreateMesh();
 
             FromFemToDrawerMesh();
@@ -116,9 +124,18 @@ public class MainViewModel : NotifyObject
 
             IsolinesCount = 10;
             _contour = new Contour(triMesh, _values!, IsolinesCount);
-            var colorMap = new ColorMap(_contour.Mesh, _values!, Palette.Rainbow);
+            _colorMap = new ColorMap(_contour.Mesh, _values!, Palette.RainbowReverse);
             
-            userDialog.SendObjectToView(colorMap);
+            userDialog.SendObjectToView(_colorMap);
+            
+            // _colorbar = new Colorbar(_values!, Palette.Rainbow)
+            // {
+            //     VerticalAlignment = VerticalAlignment.Bottom,
+            //     HorizontalAlignment = HorizontalAlignment.Right,
+            //     Margin = new Thickness(0, 0, 0, 5)
+            // };
+                        
+            // userDialog.SendColorbar(_colorbar);
 
         }, _ => _femMesh is not null);
 
@@ -149,22 +166,73 @@ public class MainViewModel : NotifyObject
                 userDialog.SendObjectToView(_contour!.Mesh);
             }
         });
+
+        ConfirmRefinement = RelayCommand.Create(_ =>
+        {
+            userDialog.DeleteObjectFromView(_colorMap!);
+            userDialog.DeleteObjectFromView(_contour!.Mesh);
+            bool delC = userDialog.DeleteObjectFromView(_contour!);
+            
+            GeneratePoints();
+            CalculateValues();
+            
+            var delaunay = new TriangleNet.Meshing.Algorithm.Dwyer();
+            var triMesh = delaunay.Triangulate(MathHelper.ToTriangleNetVertices(_points!), new Configuration());
+            
+            _contour = new Contour(triMesh, _values!, IsolinesCount);
+            _colorMap = new ColorMap(_contour.Mesh, _values!, Palette.RainbowReverse);
+            
+            userDialog.SendObjectToView(_colorMap);
+            userDialog.SendObjectToView(_contour.Mesh);
+            
+            if (delC)
+                userDialog.SendObjectToView(_contour);
+        });
+
+        ConfirmIsolinesCount = RelayCommand.Create(_ =>
+        {
+            userDialog.DeleteObjectFromView(_colorMap!);
+            bool delCm = userDialog.DeleteObjectFromView(_contour!.Mesh);
+            userDialog.DeleteObjectFromView(_contour!);
+            
+            var delaunay = new TriangleNet.Meshing.Algorithm.Dwyer();
+            var triMesh = delaunay.Triangulate(MathHelper.ToTriangleNetVertices(_points!), new Configuration());
+            
+            _contour = new Contour(triMesh, _values!, IsolinesCount);
+            _colorMap = new ColorMap(_contour.Mesh, _values!, Palette.RainbowReverse);
+            
+            userDialog.SendObjectToView(_colorMap);
+            userDialog.SendObjectToView(_contour);
+            
+            if (delCm)
+                userDialog.SendObjectToView(_contour.Mesh);
+        });
+
+        ClearViewCommand = RelayCommand.Create(_ =>
+        {
+            userDialog.ClearView();
+            userDialog.DeleteColorbar(_colorbar!);
+
+            _femMesh = null;
+            _mesh = null;
+            _contour = null;
+            _colorMap = null;
+        });
     }
 
     private void GeneratePoints()
     {
         _points ??= new List<Point>();
         _points.Clear();
-        
-        double hx = (_xMax - _xMin) / (_nx - 1);
-        double hy = (_yMax - _yMin) / (_ny - 1);
 
-        for (int i = 0; i < _ny; i++)
+        _meshParameters!.Refinement = MeshRefinement + 1;
+        _meshManager.MeshBuilder = new MeshBuilder(_meshParameters);
+        
+        _meshManager.MeshBuilder.CreatePoints();
+
+        foreach (var p in _meshManager.MeshBuilder.Points)
         {
-            for (int j = 0; j < _nx; j++)
-            {
-                _points.Add(new Point(_xMin + j * hx, _yMin + i * hy));
-            }
+            _points.Add(new Point(p.X, p.Y));
         }
     }
 
@@ -179,6 +247,9 @@ public class MainViewModel : NotifyObject
         foreach (var p in _points)
         {
             var value = _femSolver.ValueAtPoint(p.X, p.Y);
+            
+            if (Math.Abs(value - double.MinValue) < double.Epsilon) continue;
+            
             _values.Add(value);
         }
     }

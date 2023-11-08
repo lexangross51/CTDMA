@@ -50,7 +50,7 @@ public class MeshParameters
     public int[] OrdinateSplits { get; init; } = null!;
     public double[] AbscissaK { get; init; } = null!;
     public double[] OrdinateK { get; init; } = null!;
-    public int Refinement { get; init; }
+    public int Refinement { get; set; }
 
     public static MeshParameters ReadJson(string path)
     {

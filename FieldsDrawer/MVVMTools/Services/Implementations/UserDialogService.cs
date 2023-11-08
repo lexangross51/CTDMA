@@ -1,4 +1,5 @@
 ﻿using System;
+using FieldsDrawer.Core.Graphics.Colorbar;
 using FieldsDrawer.Core.Graphics.Objects;
 using FieldsDrawer.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -49,10 +50,28 @@ public class UserDialogService : IUserDialogService
         window.GraphicControl.AddObject(obj);
     }
 
-    public void DeleteObjectFromView(IBaseObject obj)
+    public bool DeleteObjectFromView(IBaseObject obj)
+    {
+        if (_mainWindow is not { } window) return false;
+        
+        return window.GraphicControl.DeleteObject(obj);
+    }
+
+    public void ClearView()
     {
         if (_mainWindow is not { } window) return;
-        
-        window.GraphicControl.DeleteObject(obj);
+        window.GraphicControl.ClearView();
+    }
+
+    public void SendColorbar(Colorbar colorbar)
+    {
+        if (_mainWindow is not { } window) return;
+        window.GraphicControl.MainGrid.Children.Add(colorbar);
+    }
+
+    public void DeleteColorbar(Colorbar colorbar)
+    {
+        if (_mainWindow is not { } window) return;
+        window.GraphicControl.MainGrid.Children.Remove(colorbar);
     }
 }

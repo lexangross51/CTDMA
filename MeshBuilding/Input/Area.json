@@ -16,8 +16,8 @@
     "Point(9.0, 4.0)",
     "Point(0.0, 6.0)",
     "Point(2.0, 6.0)",
-    "Point(4.0, 6.0)",
-    "Point(5.0, 6.0)",
+    "Point(3.0, 5.0)",
+    "Point(6.0, 5.0)",
     "Point(7.0, 6.0)",
     "Point(9.0, 6.0)"
   ],
@@ -35,7 +35,7 @@
       "BordersIndices": [4, 5, 0, 2]
     },
     {
-      "ParameterNumber": 0,
+      "ParameterNumber": 1,
       "BordersIndices": [1, 4, 1, 2]
     }
   ],
@@ -56,20 +56,35 @@
       "FormulaIndex": 0
     },
     {
-      "PointsIndices": [12, 17],
+      "PointsIndices": [12, 13],
       "BoundaryType": 1,
       "FormulaIndex": 0
+    },
+    {
+      "PointsIndices": [16, 17],
+      "BoundaryType": 1,
+      "FormulaIndex": 0
+    },
+    {
+      "PointsIndices": [13, 16],
+      "BoundaryType": 2,
+      "FormulaIndex": 1
     }
   ],
   "BoundaryFormulas": [
-    "f(x, y) = Math.Sin(x + y)",
+    "f(x, y) = 0.0",
     "f(x, y) = 2*y"
   ],
   "AreaProperties": [
     {
       "Lambda": 1.0,
       "Gamma": 0.0,
-      "F": "f(x, y) = 2 * Math.Sin(x + y)"
+      "F": "f(x, y) = 0.0"
+    },
+    {
+      "Lambda": 1.0,
+      "Gamma": 0.0,
+      "F": "f(x, y) = 4.0"
     }
   ],
   "AbscissaSplits": [3, 2, 1, 2, 3],

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:scene="clr-namespace:FieldsDrawer.Core.Graphics.Scene"
         xmlns:vm="clr-namespace:FieldsDrawer.ViewModels"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Fields drawer" Height="450" Width="900"
         SizeChanged="MainWindowOnSizeChanged">
@@ -37,16 +38,6 @@
                                       IsChecked="{Binding IsAbleToDrawMesh}"
                                       Command="{Binding DrawFemMeshCommand}"
                                       CommandParameter="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
-                            <CheckBox Content="Draw nodes numbers" IsEnabled="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
-                            <CheckBox Content="Draw elements numbers" IsEnabled="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
-                            <CheckBox Content="Draw basis numbers" IsEnabled="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
-                        </StackPanel>
-                    </GroupBox>
-                    
-                    <GroupBox Header="Boundaries">
-                        <StackPanel>
-                            <CheckBox Content="Draw dirichlet nodes" IsEnabled="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
-                            <CheckBox Content="Draw neumann edges" IsEnabled="{Binding ElementName=DrawMeshCheckBox, Path=IsChecked}"/>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
@@ -60,10 +51,14 @@
                                       Command="{Binding DrawIsolinesCommand}"
                                       CommandParameter="{Binding ElementName=DrawIsolinesCheckBox, Path=IsChecked}"/>
                             <DockPanel>
-                                <TextBlock Text="Isolines count"/>
-                                <TextBox Margin="5, 0"
-                                         Text="{Binding IsolinesCount, Mode=TwoWay}"
+                                <TextBlock x:Name="TextBlockIsolinesCount" Text="Isolines count" Width="75"/>
+                                <TextBox Width="50" Margin="5, 0"
+                                         Text="{Binding IsolinesCount, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                                          IsEnabled="{Binding ElementName=DrawIsolinesCheckBox, Path=IsChecked}"/>
+                                <Button Width="15" Height="15" Background="LawnGreen"
+                                        Command="{Binding ConfirmIsolinesCount}">
+                                    <fa:ImageAwesome Icon="Check"/>
+                                </Button>
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
@@ -74,14 +69,24 @@
                                       Command="{Binding DrawTriMeshCommand}"
                                       CommandParameter="{Binding ElementName=DrawTriMeshCheckBox, Path=IsChecked}"/>
                             <DockPanel>
-                                <TextBlock Text="Refinement"/>
-                                <TextBox Margin="5, 0" IsEnabled="{Binding ElementName=DrawTriMeshCheckBox, Path=IsChecked}"
+                                <TextBlock x:Name="TextBlockRefinement" Text="Refinement" Width="75"/>
+                                <TextBox Width="50" Margin="5, 0" IsEnabled="{Binding ElementName=DrawTriMeshCheckBox, UpdateSourceTrigger=PropertyChanged, Path=IsChecked}"
                                          Text="{Binding MeshRefinement, Mode=TwoWay}"/>
+                                <Button Width="15" Height="15" DockPanel.Dock="Right" 
+                                        Background="LawnGreen"
+                                        Command="{Binding ConfirmRefinement}">
+                                    <fa:ImageAwesome Icon="Check"/>
+                                </Button>
                             </DockPanel>
                         </StackPanel>
                     </GroupBox>
                 </StackPanel>
             </Expander>
+            
+            <Button Width="25" Background="Coral" HorizontalAlignment="Left" Margin="2"
+                    Command="{Binding ClearViewCommand}">
+                <fa:ImageAwesome Icon="Trash" Height="20"/>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

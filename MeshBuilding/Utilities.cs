@@ -166,7 +166,7 @@ public class Newton
 
     public void Compute()
     {
-        const int maxIterations = 1000;
+        const int maxIterations = 20;
         const double eps = 1E-12;
 
         CalculateEquationsValues();

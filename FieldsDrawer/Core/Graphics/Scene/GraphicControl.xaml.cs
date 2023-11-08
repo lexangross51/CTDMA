@@ -139,9 +139,17 @@ public partial class GraphicControl
         GlControl.InvalidateVisual();
     }
 
-    public void DeleteObject(IBaseObject obj)
+    public bool DeleteObject(IBaseObject obj)
     {
-        _baseGraphic.DeleteObject(obj);
+        var res = _baseGraphic.DeleteObject(obj);
+        GlControl.InvalidateVisual();
+
+        return res;
+    }
+
+    public void ClearView()
+    {
+        _baseGraphic.ClearView();
         GlControl.InvalidateVisual();
     }
 }
